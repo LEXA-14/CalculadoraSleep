@@ -2,10 +2,12 @@ package com.example.calculadorasleep.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+val CitrusZest = Color(0xFFFFA62B)
+val SeaBreeze = Color(0xFF86C5FF)
+val AmalfiTile = Color(0xFF2E5AA7)
+val CreamGelato = Color(0xFFF8E6A0)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+
+val TextDark = Color(0xFF333333)
+val TextLight = Color(0xFFFFFFFF)
+val OutlineColor = Color(0xFFD6C58B)
