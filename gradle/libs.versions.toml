@@ -25,6 +25,7 @@ ksp = "2.3.7"
 lifecycleViewmodelKtx = "2.6.2"
 mockk = "1.13.8"
 navigationCompose = "2.9.8"
+robolectric = "4.13"
 roomKtx = "2.8.4"
 roomRuntime = "2.8.4"
 kotlinxDatetime = "0.8.0"
@@ -114,6 +115,7 @@ androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", vers
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "retrofit2KotlinxSerializationConverter" }
 converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "converterMoshi" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 squareup-moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshiKotlin" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 transport-runtime = { group = "com.google.android.datatransport", name = "transport-runtime", version.ref = "transportRuntime" }

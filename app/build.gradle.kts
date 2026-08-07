@@ -91,6 +91,7 @@ dependencies {
     testImplementation(libs.dagger.hilt.android.testing)
     androidTestImplementation(libs.dagger.hilt.android.testing)
 
+    testImplementation(libs.robolectric)
     testImplementation(libs.androidx.room.testing)
     implementation(libs.compose.adaptive)
     implementation(libs.compose.adaptive.layout)
