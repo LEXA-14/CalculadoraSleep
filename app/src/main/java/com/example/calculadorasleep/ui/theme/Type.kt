@@ -8,18 +8,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.calculadorasleep.R
 
-val PlusJakartaSans = FontFamily(
-    Font(R.font.plus_jakarta_sans_regular, FontWeight.Normal),
-    Font(R.font.plus_jakarta_sans_bold, FontWeight.Bold)
-)
-
-val BeVietnamPro = FontFamily(
-    Font(R.font.be_vietnam_pro_regular, FontWeight.Normal),
-    Font(R.font.be_vietnam_pro_medium, FontWeight.Medium)
-)
-
+val PlusJakartaSans = FontFamily.Serif
+val BeVietnamPro = FontFamily.Default
 val Typography = Typography(
-    // Headlines (Plus Jakarta Sans)
     headlineLarge = TextStyle(
         fontFamily = PlusJakartaSans,
         fontWeight = FontWeight.Bold,
