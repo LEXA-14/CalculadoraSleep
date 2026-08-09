@@ -47,7 +47,7 @@ class GetSleepSinceUseCase(
 class GetSleepByIdUseCase(
     private val repository: SleepRepository
 ) {
-    suspend operator fun invoke(id: Int): Unit = repository.getById(id)
+    suspend operator fun invoke(id: Int) = repository.getById(id)
 }
 
 class ObserveSleepHistoryUseCase(

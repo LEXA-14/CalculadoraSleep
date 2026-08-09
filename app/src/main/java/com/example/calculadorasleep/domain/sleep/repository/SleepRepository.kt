@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.Flow
 interface SleepRepository{
 
     fun getAll(): Flow<List<Sleep>>
-    suspend fun getSince(since: Long):List<Sleep>
+    suspend fun getSince(since: Long):Flow<List<Sleep>>
     suspend fun getById(id: Int): Sleep?
-    suspend fun upsert(sleep: Sleep): Int
+    suspend fun upsert(sleep: Sleep)
     suspend fun delete(sleep: Sleep)
 }
