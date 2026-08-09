@@ -7,7 +7,7 @@ interface SleepRepository{
 
     fun getAll(): Flow<List<Sleep>>
     suspend fun getSince(since: Long):List<Sleep>
-    suspend fun getById(id: Int)
-    suspend fun update(sleep: Sleep)
+    suspend fun getById(id: Int): Sleep?
+    suspend fun upsert(sleep: Sleep): Int
     suspend fun delete(sleep: Sleep)
 }

@@ -2,6 +2,7 @@ package com.example.calculadorasleep.data.sleep.repository
 
 import com.example.calculadorasleep.data.sleep.local.SleepDao
 import com.example.calculadorasleep.data.sleep.mapper.toDomain
+import com.example.calculadorasleep.data.sleep.mapper.toEntity
 import com.example.calculadorasleep.domain.sleep.model.Sleep
 import com.example.calculadorasleep.domain.sleep.repository.SleepRepository
 import kotlinx.coroutines.flow.Flow
@@ -17,14 +18,14 @@ class SleepRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getSince(since: Long): List<Sleep> {
-        return dao.getSince(since).map { it.toDomain() }
+        return dao.getSince(since).map { it.toDomain() } as List<Sleep>
     }
 
-    override suspend fun getById(id: Int): Sleep? {
+    override suspend fun getById(id: Int) {
         return dao.getById(id)?.toDomain()
     }
 
-    override suspend fun update(sleep: Sleep) {
+    override suspend fun upsert(sleep: Sleep) {
         dao.upsert(sleep.toEntity())
     }
 

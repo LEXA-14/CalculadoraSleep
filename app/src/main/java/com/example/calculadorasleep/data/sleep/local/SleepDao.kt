@@ -2,26 +2,26 @@ package com.example.calculadorasleep.data.sleep.local
 
 import androidx.room.Dao
 import androidx.room.Delete
-import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SleepDao {
 
-    @Insert
-    suspend fun insert(sleep: SleepEntity)
+    @Upsert
+    suspend fun upsert(sleep: SleepEntity)
 
     @Delete
     suspend fun delete(sleep: SleepEntity)
-    @Update
-    suspend fun update(sleep: SleepEntity)
+    @Query("Delete from sleep where sleepId= :id")
+    suspend fun deleteById(id: Int)
+
 
 
     @Query("SELECT * FROM sleep ORDER BY dormirTiempo DESC")
     fun getAll(): Flow<List<SleepEntity>>
-
 
     @Query("SELECT * FROM sleep WHERE dormirTiempo >= :sinceMillis ORDER BY dormirTiempo DESC")
     fun getSince(sinceMillis: Long): Flow<List<SleepEntity>>
