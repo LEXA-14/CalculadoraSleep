@@ -7,8 +7,9 @@ import com.example.calculadorasleep.domain.sleep.repository.SleepRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class SaveSleepUseCase(
+class SaveSleepUseCase @Inject constructor(
     private val repository: SleepRepository
 ) {
     suspend operator fun invoke(sleep: Sleep): Result<Unit> {
@@ -31,7 +32,7 @@ class SaveSleepUseCase(
     }
 }
 
-class DeleteSleepUseCase(
+class DeleteSleepUseCase @Inject constructor(
     private val repository: SleepRepository
 ) {
     suspend operator fun invoke(sleep: Sleep) = repository.delete(sleep)
@@ -39,7 +40,7 @@ class DeleteSleepUseCase(
 
 
 //Debatir cuando refrescar el promedio si cada vez que se abra pantalla o mientras se agrege un resgistro nuevo
-class GetSleepSinceUseCase(
+class GetSleepSinceUseCase @Inject constructor(
     private val repository: SleepRepository
 ) {
     suspend operator fun invoke(dias: Int): Flow<List<Sleep>> {
@@ -47,19 +48,19 @@ class GetSleepSinceUseCase(
         return repository.getSince(desde)
     }
 }
-class GetSleepByIdUseCase(
+class GetSleepByIdUseCase @Inject constructor(
     private val repository: SleepRepository
 ) {
     suspend operator fun invoke(id: Int) = repository.getById(id)
 }
 
-class ObserveSleepHistoryUseCase(
+class ObserveSleepHistoryUseCase @Inject constructor(
     private val repository: SleepRepository
 ) {
     operator fun invoke(): Flow<List<Sleep>> = repository.getAll()
 }
 
-class GetSleepStatsUseCase(
+class GetSleepStatsUseCase @Inject constructor(
     private val getSleepSince: GetSleepSinceUseCase
 ) {
      suspend operator fun invoke(dias: Int = 7): Flow<SleepStats> {
