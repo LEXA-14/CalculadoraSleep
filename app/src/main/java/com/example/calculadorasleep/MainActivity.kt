@@ -9,14 +9,13 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation3.runtime.rememberNavBackStack
-import com.example.calculadorasleep.navegacion.AppNavigation
-import com.example.calculadorasleep.navegacion.Screen
+import com.example.calculadorasleep.navigation.SleepNavHost
 import com.example.calculadorasleep.ui.theme.CalculadoraSleepTheme
 import dagger.hilt.android.AndroidEntryPoint
 
