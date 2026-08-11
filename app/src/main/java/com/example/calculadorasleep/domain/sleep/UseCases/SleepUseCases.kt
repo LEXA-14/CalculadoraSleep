@@ -1,12 +1,17 @@
 package com.example.calculadorasleep.domain.sleep.UseCases
 
+import android.os.Build
+
 import com.example.calculadorasleep.domain.sleep.Validation.validateCalidad
 import com.example.calculadorasleep.domain.sleep.Validation.validateTiempos
 import com.example.calculadorasleep.domain.sleep.model.Sleep
 import com.example.calculadorasleep.domain.sleep.repository.SleepRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneId
 import javax.inject.Inject
 
 class SaveSleepUseCase @Inject constructor(
@@ -94,5 +99,50 @@ data class SleepStats(
 ) {
     companion object {
         fun vacio() = SleepStats(0, 0, 0.0, null)
+    }
+}
+
+class ResolveSleepSessionMillisUseCase @Inject constructor() {
+
+    operator fun invoke(bedTime: LocalTime, wakeTime: LocalTime): Pair<Long, Long> {
+        val zone = ZoneId.systemDefault()
+        val today = LocalDate.now(zone)
+        val bedDateTime = LocalDateTime.of(today, bedTime)
+        val wakeDateTime = if (wakeTime <= bedTime) {
+            LocalDateTime.of(today.plusDays(1), wakeTime)
+        } else {
+            LocalDateTime.of(today, wakeTime)
+        }
+        return bedDateTime.atZone(zone).toInstant().toEpochMilli() to
+                wakeDateTime.atZone(zone).toInstant().toEpochMilli()
+    }
+}
+//caso de uso que calcula
+class CalculateSleepTimesUseCase @Inject constructor() {
+
+    operator fun invoke(
+        targetTime: LocalTime,
+        mode: SleepCalculationMode
+    ): List<SleepTimeOption> {
+        val minutosParaDormirse = 14L
+        val minutosPorCiclo = 90L
+        val ciclosSugeridos = listOf(6, 5, 4) // el del medio es el "ideal"
+
+        return ciclosSugeridos.map { ciclos ->
+            val duracionMin = ciclos * minutosPorCiclo
+            val totalMin = duracionMin + minutosParaDormirse
+
+            val resultTime = when (mode) {
+                SleepCalculationMode.WAKE_UP_AT -> targetTime.minusMinutes(totalMin)
+                SleepCalculationMode.SLEEP_AT -> targetTime.plusMinutes(totalMin)
+            }
+
+            SleepTimeOption(
+                time = resultTime,
+                ciclos = ciclos,
+                duracionHoras = duracionMin / 60.0,
+                esIdeal = ciclos == 5
+            )
+        }
     }
 }
