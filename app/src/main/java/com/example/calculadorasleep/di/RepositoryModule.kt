@@ -1,6 +1,5 @@
 package com.example.calculadorasleep.di
 
-import com.example.calculadorasleep.data.sleep.repository.AuthRepositoryImpl
 import com.example.calculadorasleep.data.sleep.repository.SleepRepositoryImpl
 import com.example.calculadorasleep.domain.sleep.repository.AuthRepository
 import com.example.calculadorasleep.domain.sleep.repository.SleepRepository

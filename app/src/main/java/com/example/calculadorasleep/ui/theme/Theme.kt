@@ -33,10 +33,10 @@ private val LightColorScheme = lightColorScheme(
     tertiary = AmalfiTile,
     onTertiary = TextLight,
 
-    background = CreamGelato,
+    background = SkyMist,
     onBackground = TextDark,
 
-    surface = CreamGelato,
+    surface = SkyMist,
     onSurface = TextDark,
 
     surfaceVariant = Color.White,
