@@ -15,25 +15,25 @@ val Typography = Typography(
         fontFamily = PlusJakartaSans,
         fontWeight = FontWeight.Bold,
         fontSize = 32.sp,
-        color = TextDark
+
     ),
     headlineMedium = TextStyle(
         fontFamily = PlusJakartaSans,
         fontWeight = FontWeight.Bold,
         fontSize = 28.sp,
-        color = TextDark
+
     ),
     bodyLarge = TextStyle(
         fontFamily = BeVietnamPro,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
-        color = TextDark
+
     ),
     bodyMedium = TextStyle(
         fontFamily = BeVietnamPro,
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
-        color = TextDark
+
     ),
     labelLarge = TextStyle(
         fontFamily = BeVietnamPro,
