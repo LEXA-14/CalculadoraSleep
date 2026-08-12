@@ -1,4 +1,4 @@
-package com.example.calculadorasleep.data.sleep.local
+package com.example.calculadorasleep.data.sleep.local.sleep
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
