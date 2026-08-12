@@ -2,8 +2,10 @@ package com.example.calculadorasleep.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.calculadorasleep.data.sleep.local.SleepDao
 import com.example.calculadorasleep.data.sleep.local.SleepDatabase
+import com.example.calculadorasleep.data.sleep.local.alarm.AlarmDao
+import com.example.calculadorasleep.data.sleep.local.sleep.SleepDao
+import com.example.calculadorasleep.presentation.alarm.AlarmScheduler
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,12 +26,28 @@ object DatabaseModule {
             context,
             SleepDatabase::class.java,
             "sleep_database"
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides
     @Singleton
     fun provideSleepDao(database: SleepDatabase): SleepDao {
         return database.sleepDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideAlarmDao(database: SleepDatabase): AlarmDao {
+        return database.alarmDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideAlarmScheduler(
+        @ApplicationContext context: Context
+    ): AlarmScheduler {
+        return AlarmScheduler(context)
     }
 }
