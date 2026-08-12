@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.calculadorasleep.presentation.auth.login.LoginScreen
 import com.example.calculadorasleep.presentation.auth.register.RegisterScreen
 import com.example.calculadorasleep.presentation.home.HomeScreen
+import com.example.calculadorasleep.presentation.sleep.edit.CalculateScreen
 
 @Composable
 fun SleepNavHost() {
@@ -44,7 +45,7 @@ fun SleepNavHost() {
         }
 
         composable<Screen.Home> {
-            HomeScreen()
+            CalculateScreen()
         }
     }
 }
