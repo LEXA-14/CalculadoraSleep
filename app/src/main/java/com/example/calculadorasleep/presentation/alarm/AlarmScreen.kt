@@ -18,11 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
@@ -31,20 +27,15 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -61,11 +52,11 @@ import com.example.calculadorasleep.domain.sleep.model.Alarm
 fun AlarmScreen (
     viewModel: AlarmViewModel = hiltViewModel(),
     onAddAlarm: () -> Unit,
-    onNavigate: (String) -> Unit
+
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     RequestNotificationPermission()
-    AlarmListBody(state, viewModel::onEvent, onAddAlarm, onNavigate)
+    AlarmListBody(state, viewModel::onEvent, onAddAlarm)
 }
 
 @Composable
@@ -95,7 +86,7 @@ fun AlarmListBody(
     state: AlarmUiState,
     onEvent: (AlarmUiEvent) -> Unit,
     onAddAlarm: () -> Unit,
-    onNavigate: (String) -> Unit
+
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -140,28 +131,7 @@ fun AlarmListBody(
                 )
             }
         },
-        bottomBar = {
-            NavigationBar {
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.DateRange, contentDescription = "Calculate") },
-                    label = { Text("Calculate") },
-                    selected = false,
-                    onClick = { onNavigate("calculate") }
-                )
-                NavigationBarItem(
-                    icon = { Icon( imageVector = Icons.Default.DateRange, contentDescription = "History") },
-                    label = { Text("History") },
-                    selected = false,
-                    onClick = { onNavigate("history") }
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.CheckCircle, contentDescription = "Alarms") },
-                    label = { Text("Alarms") },
-                    selected = true,
-                    onClick = {  }
-                )
-            }
-        }
+
     ) { padding ->
         Box(
             modifier = Modifier
@@ -333,6 +303,6 @@ private fun AlarmListBodyPreview() {
                 Alarm(alarmId = 2, time = kotlinx.datetime.LocalTime(8, 0), isEnabled = false, label = "Trabajo")
             )
         )
-        AlarmListBody(state, {}, {}, {})
+        AlarmListBody(state, {}, {}, )
     }
 }

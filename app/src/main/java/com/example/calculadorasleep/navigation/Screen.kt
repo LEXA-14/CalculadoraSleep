@@ -16,6 +16,8 @@ sealed class Screen : NavKey {
     object AlarmList : Screen()
 
     @Serializable
-    object Calculate : Screen()
+    object Home : Screen()
+    @Serializable
+    object History: Screen()
 
 }
