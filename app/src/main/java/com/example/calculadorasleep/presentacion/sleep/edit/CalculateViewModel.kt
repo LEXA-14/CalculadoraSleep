@@ -9,8 +9,11 @@ import com.example.calculadorasleep.domain.sleep.UseCases.ResolveSleepSessionMil
 import com.example.calculadorasleep.domain.sleep.UseCases.SaveSleepUseCase
 import com.example.calculadorasleep.domain.sleep.UseCases.SleepCalculationMode
 import com.example.calculadorasleep.domain.sleep.UseCases.SleepTimeOption
+import com.example.calculadorasleep.domain.sleep.model.Alarm
 import com.example.calculadorasleep.domain.sleep.model.Sleep
+import com.example.calculadorasleep.domain.sleep.repository.AlarmRepository
 import com.example.calculadorasleep.presentacion.sleep.SleepTimeUtils
+import com.example.calculadorasleep.presentation.alarm.AlarmScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,7 +26,9 @@ import javax.inject.Inject
 class CalculateViewModel @Inject constructor(
     private val calculateSleepTimesUseCase: CalculateSleepTimesUseCase,
     private val resolveSleepSessionMillisUseCase: ResolveSleepSessionMillisUseCase,
-    private val saveSleepUseCase: SaveSleepUseCase
+    private val saveSleepUseCase: SaveSleepUseCase,
+    private val alarmRepository: AlarmRepository,
+    private val alarmScheduler: AlarmScheduler
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CalculateState())
@@ -53,7 +58,6 @@ class CalculateViewModel @Inject constructor(
         }
     }
 
-
     private fun onCalculate() {
         val current = _state.value
         val targetTime = SleepTimeUtils.toLocalTime(current.hour, current.minute, current.isAm)
@@ -81,6 +85,17 @@ class CalculateViewModel @Inject constructor(
                     ciclos = option.ciclos
                 )
             ).onSuccess {
+                val kotlinxTime = kotlinx.datetime.LocalTime(option.time.hour, option.time.minute)
+
+                val newAlarm = Alarm(
+                    time = kotlinxTime,
+                    isEnabled = true,
+                    label = "Alarma de Ciclo (${option.ciclos} ciclos)"
+                )
+
+                alarmRepository.upsert(newAlarm)
+                alarmScheduler.schedule(newAlarm)
+
                 _state.update {
                     it.copy(isSaving = false, selectedOption = option, message = "Horario guardado")
                 }
