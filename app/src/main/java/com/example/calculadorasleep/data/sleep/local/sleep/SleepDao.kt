@@ -1,10 +1,10 @@
-package com.example.calculadorasleep.data.sleep.local
+package com.example.calculadorasleep.data.sleep.local.sleep
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
-import androidx.room.Update
 import androidx.room.Upsert
+import com.example.calculadorasleep.data.sleep.local.sleep.SleepEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

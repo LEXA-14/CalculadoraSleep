@@ -1,7 +1,9 @@
 package com.example.calculadorasleep.di
 
+import com.example.calculadorasleep.data.sleep.repository.AlarmRepositoryImpl
 import com.example.calculadorasleep.data.sleep.repository.AuthRepositoryImpl
 import com.example.calculadorasleep.data.sleep.repository.SleepRepositoryImpl
+import com.example.calculadorasleep.domain.sleep.repository.AlarmRepository
 import com.example.calculadorasleep.domain.sleep.repository.AuthRepository
 import com.example.calculadorasleep.domain.sleep.repository.SleepRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -27,6 +29,12 @@ abstract class RepositoryModule {
     abstract fun bindSleepRepository(
         impl: SleepRepositoryImpl
     ): SleepRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAlarmRepository(
+        impl: AlarmRepositoryImpl
+    ): AlarmRepository
 
     companion object {
         @Provides

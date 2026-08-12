@@ -1,6 +1,6 @@
 package com.example.calculadorasleep.data.sleep.mapper
 
-import com.example.calculadorasleep.data.sleep.local.SleepEntity
+import com.example.calculadorasleep.data.sleep.local.sleep.SleepEntity
 import com.example.calculadorasleep.domain.sleep.model.Sleep
 
 fun SleepEntity.toDomain(): Sleep = Sleep(

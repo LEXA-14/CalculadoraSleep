@@ -1,8 +1,10 @@
 package com.example.calculadorasleep.navigation
 
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
-sealed class Screen {
+@Serializable
+sealed class Screen : NavKey {
 
     @Serializable
     data object Login : Screen()
@@ -11,5 +13,9 @@ sealed class Screen {
     data object Register : Screen()
 
     @Serializable
-    data object Home : Screen()
+    object AlarmList : Screen()
+
+    @Serializable
+    object Calculate : Screen()
+
 }
