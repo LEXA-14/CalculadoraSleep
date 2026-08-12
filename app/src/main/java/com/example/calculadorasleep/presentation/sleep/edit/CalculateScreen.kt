@@ -1,4 +1,4 @@
-package com.example.calculadorasleep.presentacion.sleep.edit
+package com.example.calculadorasleep.presentation.sleep.edit
 
 
 import androidx.compose.foundation.BorderStroke
@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -372,7 +373,7 @@ private fun formatHoras(horas: Double): String {
 }
 
 
-@androidx.compose.ui.tooling.preview.Preview(showBackground = true)
+@Preview(showBackground = true)
 @Composable
 private fun CalculateBodyPreview() {
     CalculadoraSleepTheme {
