@@ -13,6 +13,7 @@ import com.example.calculadorasleep.domain.sleep.model.Alarm
 import com.example.calculadorasleep.domain.sleep.model.Sleep
 import com.example.calculadorasleep.domain.sleep.repository.AlarmRepository
 import com.example.calculadorasleep.presentation.alarm.AlarmScheduler
+import com.example.calculadorasleep.presentation.darkMode.ThemeState
 import com.example.calculadorasleep.presentation.sleep.SleepTimeUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,7 +29,8 @@ class CalculateViewModel @Inject constructor(
     private val resolveSleepSessionMillisUseCase: ResolveSleepSessionMillisUseCase,
     private val saveSleepUseCase: SaveSleepUseCase,
     private val alarmRepository: AlarmRepository,
-    private val alarmScheduler: AlarmScheduler
+    private val alarmScheduler: AlarmScheduler,
+    private val themeState: ThemeState
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CalculateState())
@@ -37,10 +39,12 @@ class CalculateViewModel @Inject constructor(
 
     fun onEvent(event: CalculateEvent) {
         when (event) {
-            is CalculateEvent.ModeChanged ->
-                _state.update { it.copy(mode = event.mode, options = emptyList()) }
+            is CalculateEvent.ModeChanged ->{
+                themeState.setDarkMode(event.mode== SleepCalculationMode.SLEEP_AT)
+                (_state.update { it.copy(mode = event.mode, options = emptyList()) })
+            }
 
-            is CalculateEvent.HourChanged ->
+                        is CalculateEvent.HourChanged ->
                 _state.update { it.copy(hour = event.hour, options = emptyList()) }
 
             is CalculateEvent.MinuteChanged ->
