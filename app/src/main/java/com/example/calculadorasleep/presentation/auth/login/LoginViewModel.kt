@@ -42,17 +42,6 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun onForgotPasswordClicked(email: String, onResult: (Boolean, String) -> Unit) {
-        viewModelScope.launch {
-            val result = resetPasswordUseCase(email)
-            result.onSuccess {
-                onResult(true, "Correo de recuperación enviado. Revisa tu bandeja.")
-            }.onFailure { exception ->
-                onResult(false, exception.message ?: "Ocurrió un error al enviar el correo")
-            }
-        }
-    }
-
     private fun loginWithEmail() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }

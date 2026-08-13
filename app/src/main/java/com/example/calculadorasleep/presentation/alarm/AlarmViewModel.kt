@@ -2,7 +2,10 @@ package com.example.calculadorasleep.presentation.alarm
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.calculadorasleep.domain.sleep.repository.AlarmRepository
+import com.example.calculadorasleep.domain.sleep.UseCases.alarm.DeleteAlarmUseCase
+import com.example.calculadorasleep.domain.sleep.UseCases.alarm.ObserveAlarmsUseCase
+import com.example.calculadorasleep.domain.sleep.UseCases.alarm.ToggleAlarmUseCase
+import com.example.calculadorasleep.domain.sleep.UseCases.alarm.UpsertAlarmUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,8 +17,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AlarmViewModel @Inject constructor(
-    private val alarmRepository: AlarmRepository,
-    private val alarmScheduler: AlarmScheduler
+    private val observeAlarmsUseCase: ObserveAlarmsUseCase,
+    private val toggleAlarmUseCase: ToggleAlarmUseCase,
+    private val upsertAlarmUseCase: UpsertAlarmUseCase,
+    private val deleteAlarmUseCase: DeleteAlarmUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AlarmUiState(isLoading = true))
@@ -29,31 +34,20 @@ class AlarmViewModel @Inject constructor(
         when (event) {
             is AlarmUiEvent.ToggleAlarm -> {
                 viewModelScope.launch {
-                    val updated = event.alarm.copy(isEnabled = event.isEnabled)
-                    alarmRepository.upsert(updated)
-                    if (event.isEnabled) {
-                        alarmScheduler.schedule(updated)
-                    } else {
-                        alarmScheduler.cancel(updated)
-                    }
+                    toggleAlarmUseCase(event.alarm, event.isEnabled)
                 }
             }
 
             is AlarmUiEvent.DeleteAlarm -> {
                 viewModelScope.launch {
-                    alarmScheduler.cancel(event.alarm)
-                    alarmRepository.delete(event.alarm.alarmId)
+                    deleteAlarmUseCase(event.alarm)
                     _state.update { it.copy(message = "Alarma eliminada") }
                 }
             }
 
             is AlarmUiEvent.SaveAlarm -> {
                 viewModelScope.launch {
-                    alarmRepository.upsert(event.alarm)
-
-                    if (event.alarm.isEnabled) {
-                        alarmScheduler.schedule(event.alarm)
-                    }
+                    upsertAlarmUseCase(event.alarm)
                     _state.update { it.copy(message = "Alarma guardada") }
                 }
             }
@@ -64,7 +58,7 @@ class AlarmViewModel @Inject constructor(
     private fun loadAlarms() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            alarmRepository.observeAlarms().collectLatest { list ->
+            observeAlarmsUseCase().collectLatest { list ->
                 _state.update { it.copy(isLoading = false, alarms = list, message = null) }
             }
         }
