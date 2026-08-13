@@ -73,16 +73,31 @@ fun SleepNavDisplay(openDirectlyToAlarms: Boolean = false) {
                     onAddAlarm = {
                         backStack.add(Screen.Home)
                     },
+                    onLogout = {
+                        backStack.clear()
+                        backStack.add(Screen.Login)
+                    }
 
 
                 )
             }
 
             entry<Screen.Home> { key ->
-                CalculateScreen()
+                CalculateScreen(
+                    onLogout = {
+                        backStack.clear()
+                        backStack.add(Screen.Login)
+                    }
+                )
+
             }
             entry<Screen.History> { key->
-                HistoryScreen()
+                HistoryScreen(
+                    onLogout = {
+                        backStack.clear()
+                        backStack.add(Screen.Login)
+                    }
+                )
             }
         }
     )
