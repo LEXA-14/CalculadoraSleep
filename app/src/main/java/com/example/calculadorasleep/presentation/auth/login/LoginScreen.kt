@@ -42,7 +42,10 @@ fun LoginScreen(
     val webClientId = stringResource(id = R.string.web_client_id)
 
     LaunchedEffect(state.isSuccess) {
-        if (state.isSuccess) onLoginSuccess()
+        if (state.isSuccess) {
+            onLoginSuccess()
+            viewModel.onEvent(LoginUiEvent.ClearSuccess)
+        }
     }
 
     LaunchedEffect(state.error) {
