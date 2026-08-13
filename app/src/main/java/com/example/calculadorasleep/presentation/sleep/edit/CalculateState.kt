@@ -1,4 +1,4 @@
-package com.example.calculadorasleep.presentacion.sleep.edit
+package com.example.calculadorasleep.presentation.sleep.edit
 
 import com.example.calculadorasleep.domain.sleep.UseCases.SleepCalculationMode
 import com.example.calculadorasleep.domain.sleep.UseCases.SleepTimeOption
