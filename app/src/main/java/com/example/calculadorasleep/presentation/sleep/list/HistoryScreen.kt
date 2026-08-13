@@ -28,10 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -43,7 +40,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.calculadorasleep.domain.sleep.UseCases.SleepStats
 import com.example.calculadorasleep.domain.sleep.model.Sleep
 import com.example.calculadorasleep.presentation.auth.Logout.LogoutButton
-import com.example.calculadorasleep.presentation.auth.Logout.LogoutViewModel
 import com.example.calculadorasleep.ui.theme.CalculadoraSleepTheme
 import java.time.Instant
 import java.time.ZoneId
@@ -89,6 +85,7 @@ fun HistoryBody(
                 .padding(horizontal = 20.dp)
         ) {
             Spacer(Modifier.height(16.dp))
+
             Text(
                 text = "Historial de sueño",
                 style = MaterialTheme.typography.headlineSmall,
