@@ -303,6 +303,18 @@ private fun AlarmListBodyPreview() {
                 Alarm(alarmId = 2, time = kotlinx.datetime.LocalTime(8, 0), isEnabled = false, label = "Trabajo")
             )
         )
-        AlarmListBody(state, {}, {}, )
+        AlarmListBody(state, {}, {})
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AlarmItemPreview() {
+    MaterialTheme {
+        AlarmItem(
+            alarm = Alarm(alarmId = 1, time = kotlinx.datetime.LocalTime(7, 30), isEnabled = true, label = "Despertar"),
+            onToggle = {},
+            onItemClick = {}
+        )
     }
 }

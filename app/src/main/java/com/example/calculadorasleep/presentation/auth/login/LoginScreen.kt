@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
@@ -30,7 +31,7 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen (
+fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
     onNavigateToRegister: () -> Unit,
     onLoginSuccess: () -> Unit
@@ -78,6 +79,29 @@ fun LoginScreen (
         }
     }
 
+    LoginBody(
+        state = state,
+        onEvent = viewModel::onEvent,
+        onNavigateToRegister = onNavigateToRegister,
+        onGoogleSignInClick = { launchGoogleSignIn() },
+        onForgotPasswordClick = { email ->
+            if (email.isNotBlank()) {
+                viewModel.onEvent(LoginUiEvent.ForgotPassword(email))
+            } else {
+                Toast.makeText(context, "Por favor, escribe tu correo arriba primero", Toast.LENGTH_SHORT).show()
+            }
+        }
+    )
+}
+
+@Composable
+fun LoginBody(
+    state: LoginUiState,
+    onEvent: (LoginUiEvent) -> Unit,
+    onNavigateToRegister: () -> Unit,
+    onGoogleSignInClick: () -> Unit,
+    onForgotPasswordClick: (String) -> Unit
+) {
     Scaffold { padding ->
         Box(
             modifier = Modifier
@@ -145,7 +169,7 @@ fun LoginScreen (
 
                     OutlinedTextField(
                         value = state.email,
-                        onValueChange = { viewModel.onEvent(LoginUiEvent.EmailChanged(it)) },
+                        onValueChange = { onEvent(LoginUiEvent.EmailChanged(it)) },
                         label = { Text("Correo Electrónico") },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
@@ -157,7 +181,7 @@ fun LoginScreen (
 
                     OutlinedTextField(
                         value = state.password,
-                        onValueChange = { viewModel.onEvent(LoginUiEvent.PasswordChanged(it)) },
+                        onValueChange = { onEvent(LoginUiEvent.PasswordChanged(it)) },
                         label = { Text("Contraseña") },
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
@@ -177,15 +201,7 @@ fun LoginScreen (
                             color = MaterialTheme.colorScheme.primary,
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.clickable {
-                                if (state.email.isNotBlank()) {
-                                    viewModel.onEvent(LoginUiEvent.ForgotPassword(state.email))
-                                } else {
-                                    Toast.makeText(
-                                        context,
-                                        "Por favor, escribe tu correo arriba primero",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
+                                onForgotPasswordClick(state.email)
                             }
                         )
                     }
@@ -193,7 +209,7 @@ fun LoginScreen (
                     Spacer(modifier = Modifier.height(24.dp))
 
                     Button(
-                        onClick = { viewModel.onEvent(LoginUiEvent.LoginSubmit) },
+                        onClick = { onEvent(LoginUiEvent.LoginSubmit) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
@@ -233,7 +249,7 @@ fun LoginScreen (
                     }
 
                     OutlinedButton(
-                        onClick = { launchGoogleSignIn() },
+                        onClick = onGoogleSignInClick,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
@@ -261,5 +277,19 @@ fun LoginScreen (
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LoginBodyPreview() {
+    MaterialTheme {
+        LoginBody(
+            state = LoginUiState(email = "test@example.com"),
+            onEvent = {},
+            onNavigateToRegister = {},
+            onGoogleSignInClick = {},
+            onForgotPasswordClick = {}
+        )
     }
 }
