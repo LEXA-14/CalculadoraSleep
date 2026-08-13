@@ -6,8 +6,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.calculadorasleep.navigation.SleepNavDisplay
+import com.example.calculadorasleep.presentation.darkMode.ThemeViewModel
 import com.example.calculadorasleep.ui.theme.CalculadoraSleepTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -18,7 +22,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         val openAlarmsDirectly = intent?.action == "ACTION_OPEN_ALARMS"
         setContent {
-            CalculadoraSleepTheme {
+            val themeViewModel: ThemeViewModel= hiltViewModel()
+            val isDarkMode by themeViewModel.isDarkMode.collectAsStateWithLifecycle()
+            CalculadoraSleepTheme (darkTheme = isDarkMode){
                 Surface(modifier = Modifier.fillMaxSize()) {
                     SleepNavDisplay(openDirectlyToAlarms = openAlarmsDirectly)
                 }
