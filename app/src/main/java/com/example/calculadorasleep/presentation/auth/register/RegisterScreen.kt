@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
@@ -78,6 +79,21 @@ fun RegisterScreen (
         }
     }
 
+    RegisterBody(
+        state = state,
+        onEvent = viewModel::onEvent,
+        onNavigateToLogin = onNavigateToLogin,
+        onGoogleSignInClick = { launchGoogleSignIn() }
+    )
+}
+
+@Composable
+fun RegisterBody(
+    state: RegisterUiState,
+    onEvent: (RegisterUiEvent) -> Unit,
+    onNavigateToLogin: () -> Unit,
+    onGoogleSignInClick: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -143,7 +159,7 @@ fun RegisterScreen (
 
                 OutlinedTextField(
                     value = state.fullName,
-                    onValueChange = { viewModel.onEvent(RegisterUiEvent.FullNameChanged(it)) },
+                    onValueChange = { onEvent(RegisterUiEvent.FullNameChanged(it)) },
                     label = { Text("Nombre Completo") },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
@@ -154,7 +170,7 @@ fun RegisterScreen (
 
                 OutlinedTextField(
                     value = state.email,
-                    onValueChange = { viewModel.onEvent(RegisterUiEvent.EmailChanged(it)) },
+                    onValueChange = { onEvent(RegisterUiEvent.EmailChanged(it)) },
                     label = { Text("Correo Electrónico") },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
@@ -166,7 +182,7 @@ fun RegisterScreen (
 
                 OutlinedTextField(
                     value = state.password,
-                    onValueChange = { viewModel.onEvent(RegisterUiEvent.PasswordChanged(it)) },
+                    onValueChange = { onEvent(RegisterUiEvent.PasswordChanged(it)) },
                     label = { Text("Contraseña") },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
@@ -178,7 +194,7 @@ fun RegisterScreen (
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Button(
-                    onClick = { viewModel.onEvent(RegisterUiEvent.RegisterSubmit) },
+                    onClick = { onEvent(RegisterUiEvent.RegisterSubmit) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
@@ -205,7 +221,7 @@ fun RegisterScreen (
                 }
 
                 OutlinedButton(
-                    onClick = { launchGoogleSignIn() },
+                    onClick = onGoogleSignInClick,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
@@ -232,5 +248,18 @@ fun RegisterScreen (
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun RegisterBodyPreview() {
+    MaterialTheme {
+        RegisterBody(
+            state = RegisterUiState(fullName = "Yudelka Torres", email = "test@example.com"),
+            onEvent = {},
+            onNavigateToLogin = {},
+            onGoogleSignInClick = {}
+        )
     }
 }
