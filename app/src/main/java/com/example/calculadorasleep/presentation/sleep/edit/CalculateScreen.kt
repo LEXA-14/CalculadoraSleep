@@ -18,11 +18,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -37,7 +36,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -50,9 +52,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.calculadorasleep.domain.sleep.UseCases.SleepCalculationMode
 import com.example.calculadorasleep.domain.sleep.UseCases.SleepTimeOption
+import com.example.calculadorasleep.presentation.auth.Logout.LogoutDialog
+import com.example.calculadorasleep.presentation.auth.Logout.LogoutViewModel
 
 import com.example.calculadorasleep.ui.theme.CalculadoraSleepTheme
 import com.example.calculadorasleep.ui.theme.CreamGelato
+import kotlinx.coroutines.launch
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -60,12 +65,16 @@ import java.util.Locale
 
 @Composable
 fun CalculateScreen(
-    viewModel: CalculateViewModel = hiltViewModel()
+    onLogout:()-> Unit,
+    viewModel: CalculateViewModel = hiltViewModel(),
+
 ) {
+
     val state by viewModel.state.collectAsStateWithLifecycle()
     CalculateBody(
         state = state,
-        onEvent = viewModel::onEvent
+        onEvent = viewModel::onEvent,
+        onLogout=onLogout
     )
 }
 
@@ -73,7 +82,8 @@ fun CalculateScreen(
 @Composable
 fun CalculateBody(
     state: CalculateState,
-    onEvent: (CalculateEvent) -> Unit
+    onEvent: (CalculateEvent) -> Unit,
+    onLogout: () -> Unit
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -95,7 +105,7 @@ fun CalculateBody(
                 .padding(horizontal = 20.dp)
         ) {
             Spacer(Modifier.height(8.dp))
-            CalculateTopBar()
+            CalculateTopBar(onLogout=onLogout)
 
             Spacer(Modifier.height(16.dp))
             ModeSelector(mode = state.mode, onEvent = onEvent)
@@ -152,20 +162,44 @@ fun CalculateBody(
 }
 
 @Composable
-private fun CalculateTopBar() {
+private fun CalculateTopBar(
+    onLogout: () -> Unit,
+    logoutViewModel: LogoutViewModel=hiltViewModel()
+) {
+    var showLogoutDialog by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(Icons.Default.Menu, contentDescription = "Menú")
+
         Text(
             text = "Deep Sleep",
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
         )
-        Icon(Icons.Default.Settings, contentDescription = "Ajustes")
+        IconButton(onClick = { showLogoutDialog = true }) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.Logout,
+                contentDescription = "Cerrar sesión",
+                tint = MaterialTheme.colorScheme.onBackground
+            )
+        }
+
+    }
+    if (showLogoutDialog) {
+        LogoutDialog(
+            onDismiss = { showLogoutDialog = false },
+            onConfirm = {
+                showLogoutDialog = false
+                scope.launch {
+                    logoutViewModel.logout()
+                    onLogout()
+                }
+            }
+        )
     }
 }
 
@@ -387,7 +421,8 @@ private fun CalculateBodyPreview() {
                     SleepTimeOption(LocalTime.of(1, 30), 4, 6.0, false)
                 )
             ),
-            onEvent = {}
+            onEvent = {},
+            onLogout = {}
         )
     }
 }

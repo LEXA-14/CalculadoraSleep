@@ -28,7 +28,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -39,6 +42,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.calculadorasleep.domain.sleep.UseCases.SleepStats
 import com.example.calculadorasleep.domain.sleep.model.Sleep
+import com.example.calculadorasleep.presentation.auth.Logout.LogoutButton
+import com.example.calculadorasleep.presentation.auth.Logout.LogoutViewModel
 import com.example.calculadorasleep.ui.theme.CalculadoraSleepTheme
 import java.time.Instant
 import java.time.ZoneId
@@ -47,17 +52,24 @@ import java.util.Locale
 
 @Composable
 fun HistoryScreen(
-    viewModel: HistoryViewModel = hiltViewModel()
+    viewModel: HistoryViewModel = hiltViewModel(),
+    onLogout:()-> Unit,
+
 ) {
+
+
     val state by viewModel.state.collectAsStateWithLifecycle()
-    HistoryBody(state = state, onEvent = viewModel::onEvent)
+    HistoryBody(state = state, onEvent = viewModel::onEvent, onLogout=onLogout)
 }
 
 @Composable
 fun HistoryBody(
     state: HistoryUiState,
-    onEvent: (HistoryUiEvent) -> Unit
+    onEvent: (HistoryUiEvent) -> Unit,
+    onLogout: () -> Unit,
 ) {
+
+
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(state.message, state.error) {
@@ -83,6 +95,7 @@ fun HistoryBody(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
             )
+            LogoutButton(onLogout=onLogout)
 
             Spacer(Modifier.height(16.dp))
             StatsCard(stats = state.stats)
@@ -113,7 +126,9 @@ fun HistoryBody(
                         items(items = state.registros, key = { it.sleepId }) { sleep ->
                             SleepHistoryItem(
                                 sleep = sleep,
-                                onDelete = { onEvent(HistoryUiEvent.Delete(sleep)) }
+                                onDelete = { onEvent(HistoryUiEvent.Delete(sleep))
+
+                                }
                             )
                         }
                         item { Spacer(Modifier.height(16.dp)) }
@@ -159,7 +174,8 @@ private fun StatItem(label: String, value: String) {
 @Composable
 private fun SleepHistoryItem(
     sleep: Sleep,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+
 ) {
     val timeFormatter = remember { DateTimeFormatter.ofPattern("hh:mm a", Locale.getDefault()) }
     val dateFormatter = remember { DateTimeFormatter.ofPattern("dd MMM", Locale.getDefault()) }
@@ -232,7 +248,8 @@ private fun HistoryBodyPreview() {
                 ),
                 stats = SleepStats(noches = 5, duracionPromedioMin = 420, ciclosPromedio = 4.6, calidadPromedio = 3.8)
             ),
-            onEvent = {}
+            onEvent = {},
+            onLogout = {}
         )
     }
 }

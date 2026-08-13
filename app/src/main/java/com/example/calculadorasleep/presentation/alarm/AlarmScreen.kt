@@ -47,16 +47,18 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.calculadorasleep.domain.sleep.model.Alarm
+import com.example.calculadorasleep.presentation.auth.Logout.LogoutButton
 
 @Composable
 fun AlarmScreen (
     viewModel: AlarmViewModel = hiltViewModel(),
     onAddAlarm: () -> Unit,
+    onLogout:()-> Unit
 
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     RequestNotificationPermission()
-    AlarmListBody(state, viewModel::onEvent, onAddAlarm)
+    AlarmListBody(state, viewModel::onEvent, onAddAlarm,onLogout)
 }
 
 @Composable
@@ -86,6 +88,7 @@ fun AlarmListBody(
     state: AlarmUiState,
     onEvent: (AlarmUiEvent) -> Unit,
     onAddAlarm: () -> Unit,
+    onLogout: () -> Unit
 
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
@@ -110,12 +113,7 @@ fun AlarmListBody(
                     )
                 },
                 actions = {
-                    IconButton(onClick = { }) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = "Ajustes"
-                        )
-                    }
+                    LogoutButton(onLogout=onLogout)
                 }
             )
         },
@@ -303,7 +301,7 @@ private fun AlarmListBodyPreview() {
                 Alarm(alarmId = 2, time = kotlinx.datetime.LocalTime(8, 0), isEnabled = false, label = "Trabajo")
             )
         )
-        AlarmListBody(state, {}, {})
+        AlarmListBody(state, {}, {},{})
     }
 }
 

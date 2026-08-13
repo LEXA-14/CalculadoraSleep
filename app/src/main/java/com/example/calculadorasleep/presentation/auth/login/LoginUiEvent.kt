@@ -6,6 +6,7 @@ sealed class LoginUiEvent {
     object LoginSubmit : LoginUiEvent()
     data class GoogleSignInSubmit(val idToken: String) : LoginUiEvent()
     object ClearError : LoginUiEvent()
+    object ClearSuccess : LoginUiEvent()
 
     data class ForgotPassword(val email: String) : LoginUiEvent()
 }
