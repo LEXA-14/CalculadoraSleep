@@ -120,11 +120,7 @@ fun CalculateBody(
                     ModeSelector(mode = state.mode, onEvent = onEvent)
                 }
             }
-//            Spacer(Modifier.height(8.dp))
-//            CalculateTopBar(onLogout=onLogout)
-//
-//            Spacer(Modifier.height(16.dp))
-//            ModeSelector(mode = state.mode, onEvent = onEvent)
+
 
             Spacer(Modifier.height(16.dp))
             Text(
@@ -153,7 +149,8 @@ fun CalculateBody(
             if (state.options.isNotEmpty()) {
                 Spacer(Modifier.height(28.dp))
                 Text(
-                    text = "Mejores horas para dormir",
+                    text = if(state.mode== SleepCalculationMode.WAKE_UP_AT)
+                        "Mejores horas para dormir" else "Mejores horas para despertar",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
