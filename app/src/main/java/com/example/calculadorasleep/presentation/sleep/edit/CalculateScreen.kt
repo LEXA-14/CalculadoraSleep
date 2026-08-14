@@ -1,6 +1,5 @@
 package com.example.calculadorasleep.presentation.sleep.edit
 
-
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +24,7 @@ import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -35,6 +35,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -62,22 +63,32 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-
 @Composable
 fun CalculateScreen(
-    onLogout:()-> Unit,
-    viewModel: CalculateViewModel = hiltViewModel(),
-
+    alarmId: Int,
+    onBack: () -> Unit,
+    onLogout: () -> Unit,
+    viewModel: CalculateViewModel = hiltViewModel()
 ) {
-
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(alarmId) {
+        viewModel.onEvent(CalculateEvent.Load(alarmId))
+    }
+
+    LaunchedEffect(state.saved, state.deleted) {
+        if (state.saved || state.deleted) {
+            onBack()
+            viewModel.onEvent(CalculateEvent.ClearMessage)
+        }
+    }
+
     CalculateBody(
         state = state,
         onEvent = viewModel::onEvent,
-        onLogout=onLogout
+        onLogout = onLogout
     )
 }
-
 
 @Composable
 fun CalculateBody(
@@ -86,6 +97,7 @@ fun CalculateBody(
     onLogout: () -> Unit
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(state.message, state.error) {
         (state.message ?: state.error)?.let {
@@ -121,7 +133,6 @@ fun CalculateBody(
                 }
             }
 
-
             Spacer(Modifier.height(16.dp))
             Text(
                 text = if (state.mode == SleepCalculationMode.WAKE_UP_AT)
@@ -149,7 +160,7 @@ fun CalculateBody(
             if (state.options.isNotEmpty()) {
                 Spacer(Modifier.height(28.dp))
                 Text(
-                    text = if(state.mode== SleepCalculationMode.WAKE_UP_AT)
+                    text = if (state.mode == SleepCalculationMode.WAKE_UP_AT)
                         "Mejores horas para dormir" else "Mejores horas para despertar",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
@@ -167,9 +178,75 @@ fun CalculateBody(
                         )
                     }
                 }
+
+                Spacer(Modifier.height(24.dp))
+                Button(
+                    onClick = { onEvent(CalculateEvent.Save) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                ) {
+                    Text(if (state.isNew) "GUARDAR" else "ACTUALIZAR", fontWeight = FontWeight.Bold)
+                }
+
+                if (!state.isNew) {
+                    Spacer(Modifier.height(12.dp))
+                    OutlinedButtonCustom(
+                        onClick = { showDeleteDialog = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp)
+                    ) {
+                        Text("ELIMINAR", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.error)
+                    }
+                }
             }
 
             Spacer(Modifier.height(24.dp))
+        }
+    }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Eliminar alarma") },
+            text = { Text("¿Estás seguro de que deseas eliminar esta alarma?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        onEvent(CalculateEvent.Delete)
+                    }
+                ) {
+                    Text("Sí, eliminar", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun OutlinedButtonCustom(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier,
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
+    ) {
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+            content()
         }
     }
 }
@@ -177,7 +254,7 @@ fun CalculateBody(
 @Composable
 private fun CalculateTopBar(
     onLogout: () -> Unit,
-    logoutViewModel: LogoutViewModel=hiltViewModel()
+    logoutViewModel: LogoutViewModel = hiltViewModel()
 ) {
     var showLogoutDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
@@ -186,7 +263,6 @@ private fun CalculateTopBar(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-
         Text(
             text = "Deep Sleep",
             style = MaterialTheme.typography.headlineSmall,
@@ -200,7 +276,6 @@ private fun CalculateTopBar(
                 tint = MaterialTheme.colorScheme.onBackground
             )
         }
-
     }
     if (showLogoutDialog) {
         LogoutDialog(
@@ -218,8 +293,10 @@ private fun CalculateTopBar(
 
 @Composable
 private fun ModeSelector(mode: SleepCalculationMode, onEvent: (CalculateEvent) -> Unit) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier.height(IntrinsicSize.Max)) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.height(IntrinsicSize.Max)
+    ) {
         ModeChip(
             label = "Quiero despertarme a...",
             icon = Icons.Default.WbSunny,
@@ -256,14 +333,17 @@ private fun ModeChip(
         else MaterialTheme.colorScheme.surfaceVariant
     ) {
         Row(
-            modifier = Modifier.fillMaxHeight().
-            padding(horizontal = 18.dp, vertical = 16.dp),
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(horizontal = 18.dp, vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp))
-            Text(text = label, style = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.Medium,
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodySmall,
+                fontWeight = FontWeight.Medium,
                 maxLines = 2
             )
         }
@@ -290,10 +370,12 @@ private fun TimePickerCard(state: CalculateState, onEvent: (CalculateEvent) -> U
                     testTag = "stepper_hour",
                     onChange = { onEvent(CalculateEvent.HourChanged(it)) }
                 )
-                Text(":",
+                Text(
+                    ":",
                     style = MaterialTheme.typography.displayMedium,
                     fontWeight = FontWeight.Bold,
-                    color=MaterialTheme.colorScheme.onSurfaceVariant)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 NumberStepper(
                     value = state.minute,
                     range = 0..59,
@@ -326,7 +408,9 @@ private fun NumberStepper(
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.width(64.dp).testTag(testTag)
+        modifier = Modifier
+            .width(64.dp)
+            .testTag(testTag)
     ) {
         IconButton(onClick = { step(1) }, modifier = Modifier.testTag("${testTag}_up")) {
             Icon(Icons.Default.KeyboardArrowUp, contentDescription = "Aumentar")
@@ -335,7 +419,7 @@ private fun NumberStepper(
             text = value.toString().padStart(2, '0'),
             style = MaterialTheme.typography.displayMedium,
             fontWeight = FontWeight.Bold,
-            color=MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         IconButton(onClick = { step(-1) }, modifier = Modifier.testTag("${testTag}_down")) {
             Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Disminuir")
@@ -368,7 +452,6 @@ private fun PeriodButton(
         )
     }
 }
-
 
 @Composable
 private fun SleepOptionCard(option: SleepTimeOption, selected: Boolean, onClick: () -> Unit) {
@@ -429,7 +512,6 @@ private fun formatHoras(horas: Double): String {
     val m = ((horas - h) * 60).toInt()
     return if (m == 0) "$h horas" else "$h horas y $m minutos"
 }
-
 
 @Preview(showBackground = true)
 @Composable

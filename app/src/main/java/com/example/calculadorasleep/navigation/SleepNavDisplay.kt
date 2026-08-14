@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -17,89 +16,102 @@ import com.example.calculadorasleep.presentation.sleep.list.HistoryScreen
 
 @Composable
 fun SleepNavDisplay(openDirectlyToAlarms: Boolean = false) {
-    val startScreen = if (openDirectlyToAlarms) Screen.Home else Screen.Login
+    val startScreen = if (openDirectlyToAlarms) Screen.Home(0) else Screen.Login
     val backStack = rememberNavBackStack(startScreen)
+    val currentScreen = backStack.lastOrNull()
+    val showBottomBar = currentScreen is Screen.Home ||
+            currentScreen is Screen.AlarmList ||
+            currentScreen is Screen.History
 
-    val currentScreen=backStack.lastOrNull()
-    val showBottomBar= currentScreen is Screen.Home||
-            currentScreen is Screen.AlarmList
-            || currentScreen is Screen.History
-
-    Scaffold(bottomBar = {
-        if (showBottomBar){
-            AppBottomNavBar(
-                currentScreen=currentScreen,
-                onNavigate = { screen ->
-                    backStack.clear()
-                    backStack.add(screen)
-                }
-            )
-        }
-    }
-    ) { innerPadding->
-        NavDisplay(
-        backStack = backStack,
-        modifier = Modifier.fillMaxSize()
-            .padding(innerPadding),
-        entryProvider = entryProvider {
-            entry<Screen.Login> { key ->
-                LoginScreen(
-                    onNavigateToRegister = {
-                        backStack.add(Screen.Register)
-                    },
-                    onLoginSuccess = {
-                        backStack.clear()
-                        backStack.add(Screen.Home)
-                    }
-                )
-            }
-
-            entry<Screen.Register> { key ->
-                RegisterScreen(
-                    onNavigateToLogin = {
-                        if (backStack.isNotEmpty()) {
-                            backStack.removeAt(backStack.size - 1)
+    Scaffold(
+        bottomBar = {
+            if (showBottomBar) {
+                AppBottomNavBar(
+                    currentScreen = currentScreen,
+                    onNavigate = { screen ->
+                        if (currentScreen != screen) {
+                            backStack.clear()
+                            backStack.add(screen)
                         }
-                    },
-                    onRegisterSuccess = {
-                        backStack.clear()
-                        backStack.add(Screen.AlarmList)
-                    }
-                )
-            }
-
-            entry<Screen.AlarmList> { key ->
-                AlarmScreen(
-                    onAddAlarm = {
-                        backStack.add(Screen.Home)
-                    },
-                    onLogout = {
-                        backStack.clear()
-                        backStack.add(Screen.Login)
-                    }
-
-
-                )
-            }
-
-            entry<Screen.Home> { key ->
-                CalculateScreen(
-                    onLogout = {
-                        backStack.clear()
-                        backStack.add(Screen.Login)
-                    }
-                )
-
-            }
-            entry<Screen.History> { key->
-                HistoryScreen(
-                    onLogout = {
-                        backStack.clear()
-                        backStack.add(Screen.Login)
                     }
                 )
             }
         }
-    )
-}
+    ) { innerPadding ->
+        NavDisplay(
+            backStack = backStack,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            entryProvider = entryProvider {
+                entry<Screen.Login> {
+                    LoginScreen(
+                        onNavigateToRegister = {
+                            backStack.add(Screen.Register)
+                        },
+                        onLoginSuccess = {
+                            backStack.clear()
+                            backStack.add(Screen.Home(0))
+                        }
+                    )
+                }
+
+                entry<Screen.Register> {
+                    RegisterScreen(
+                        onNavigateToLogin = {
+                            if (backStack.isNotEmpty()) {
+                                backStack.removeAt(backStack.size - 1)
+                            }
+                        },
+                        onRegisterSuccess = {
+                            backStack.clear()
+                            backStack.add(Screen.AlarmList)
+                        }
+                    )
+                }
+
+                entry<Screen.AlarmList> {
+                    AlarmScreen(
+                        onAddAlarm = {
+                            backStack.add(Screen.Home(0))
+                        },
+                        onEditAlarm = { alarmId ->
+                            backStack.add(Screen.Home(alarmId))
+                        },
+                        onLogout = {
+                            backStack.clear()
+                            backStack.add(Screen.Login)
+                        }
+                    )
+                }
+
+                entry<Screen.Home> { key ->
+                    CalculateScreen(
+                        alarmId = key.alarmId,
+                        onLogout = {
+                            backStack.clear()
+                            backStack.add(Screen.Login)
+                        },
+                        onBack = {
+                            if (backStack.size > 1) {
+                                backStack.removeAt(backStack.size - 1)
+                            } else {
+                                backStack.clear()
+                                backStack.add(Screen.AlarmList)
+                            }
+                        }
+                    )
+                }
+
+                entry<Screen.History> {
+                    HistoryScreen(
+                        onLogout = {
+                            backStack.clear()
+                            backStack.add(Screen.Login)
+                        }
+                    )
+                }
+            }
+        )
     }
+}
