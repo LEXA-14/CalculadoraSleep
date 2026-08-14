@@ -6,8 +6,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -54,9 +56,7 @@ import com.example.calculadorasleep.domain.sleep.UseCases.SleepCalculationMode
 import com.example.calculadorasleep.domain.sleep.UseCases.SleepTimeOption
 import com.example.calculadorasleep.presentation.auth.Logout.LogoutDialog
 import com.example.calculadorasleep.presentation.auth.Logout.LogoutViewModel
-
 import com.example.calculadorasleep.ui.theme.CalculadoraSleepTheme
-import com.example.calculadorasleep.ui.theme.CreamGelato
 import kotlinx.coroutines.launch
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -104,11 +104,23 @@ fun CalculateBody(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp)
         ) {
-            Spacer(Modifier.height(8.dp))
-            CalculateTopBar(onLogout=onLogout)
+            Box(modifier = Modifier.fillMaxWidth()) {
+                SkyIllustration(
+                    mode = state.mode,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(140.dp)
+                        .align(Alignment.TopCenter)
+                )
+                Column {
+                    Spacer(Modifier.height(8.dp))
+                    CalculateTopBar(onLogout = onLogout)
 
-            Spacer(Modifier.height(16.dp))
-            ModeSelector(mode = state.mode, onEvent = onEvent)
+                    Spacer(Modifier.height(16.dp))
+                    ModeSelector(mode = state.mode, onEvent = onEvent)
+                }
+            }
+
 
             Spacer(Modifier.height(16.dp))
             Text(
@@ -137,7 +149,8 @@ fun CalculateBody(
             if (state.options.isNotEmpty()) {
                 Spacer(Modifier.height(28.dp))
                 Text(
-                    text = "Mejores horas para dormir",
+                    text = if(state.mode== SleepCalculationMode.WAKE_UP_AT)
+                        "Mejores horas para dormir" else "Mejores horas para despertar",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
@@ -205,7 +218,8 @@ private fun CalculateTopBar(
 
 @Composable
 private fun ModeSelector(mode: SleepCalculationMode, onEvent: (CalculateEvent) -> Unit) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.height(IntrinsicSize.Max)) {
         ModeChip(
             label = "Quiero despertarme a...",
             icon = Icons.Default.WbSunny,
@@ -237,17 +251,21 @@ private fun ModeChip(
 ) {
     Surface(
         modifier = modifier.clickable(onClick = onClick),
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(28.dp),
         color = if (selected) MaterialTheme.colorScheme.secondary.copy(alpha = 0.35f)
         else MaterialTheme.colorScheme.surfaceVariant
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            modifier = Modifier.fillMaxHeight().
+            padding(horizontal = 18.dp, vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp))
-            Text(text = label, style = MaterialTheme.typography.bodySmall)
+            Text(text = label, style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.Medium,
+                maxLines = 2
+            )
         }
     }
 }
@@ -258,6 +276,7 @@ private fun TimePickerCard(state: CalculateState, onEvent: (CalculateEvent) -> U
         shape = RoundedCornerShape(20.dp),
         color = MaterialTheme.colorScheme.surfaceVariant,
         shadowElevation = 3.dp,
+        border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.tertiary),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(
@@ -271,7 +290,10 @@ private fun TimePickerCard(state: CalculateState, onEvent: (CalculateEvent) -> U
                     testTag = "stepper_hour",
                     onChange = { onEvent(CalculateEvent.HourChanged(it)) }
                 )
-                Text(":", style = MaterialTheme.typography.displayMedium, fontWeight = FontWeight.Bold)
+                Text(":",
+                    style = MaterialTheme.typography.displayMedium,
+                    fontWeight = FontWeight.Bold,
+                    color=MaterialTheme.colorScheme.onSurfaceVariant)
                 NumberStepper(
                     value = state.minute,
                     range = 0..59,
@@ -312,7 +334,8 @@ private fun NumberStepper(
         Text(
             text = value.toString().padStart(2, '0'),
             style = MaterialTheme.typography.displayMedium,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color=MaterialTheme.colorScheme.onSurfaceVariant
         )
         IconButton(onClick = { step(-1) }, modifier = Modifier.testTag("${testTag}_down")) {
             Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Disminuir")
@@ -332,8 +355,8 @@ private fun PeriodButton(
             .clickable(onClick = onClick)
             .testTag(testTag),
         shape = RoundedCornerShape(12.dp),
-        color = if (selected) MaterialTheme.colorScheme.tertiary
-        else CreamGelato,
+        color = if (selected) MaterialTheme.colorScheme.primary
+        else MaterialTheme.colorScheme.surfaceVariant,
         border = if (!selected) BorderStroke(1.dp, MaterialTheme.colorScheme.outline) else null
     ) {
         Text(
@@ -341,7 +364,7 @@ private fun PeriodButton(
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
             fontWeight = FontWeight.Bold,
             color = if (selected) MaterialTheme.colorScheme.onPrimary
-            else MaterialTheme.colorScheme.onSurface
+            else MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
