@@ -19,7 +19,7 @@ fun AppBottomNavBar(
             icon = { Icon(Icons.Default.DateRange, contentDescription = "Calculate") },
             label = { Text("Calculate") },
             selected = currentScreen is Screen.Home,
-            onClick = { onNavigate(Screen.Home) }
+            onClick = { onNavigate(Screen.Home(0)) }
         )
         NavigationBarItem(
             icon = { Icon(Icons.Default.DateRange, contentDescription = "History") },
