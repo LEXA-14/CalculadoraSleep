@@ -6,8 +6,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -219,7 +221,8 @@ private fun CalculateTopBar(
 
 @Composable
 private fun ModeSelector(mode: SleepCalculationMode, onEvent: (CalculateEvent) -> Unit) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.height(IntrinsicSize.Max)) {
         ModeChip(
             label = "Quiero despertarme a...",
             icon = Icons.Default.WbSunny,
@@ -251,17 +254,21 @@ private fun ModeChip(
 ) {
     Surface(
         modifier = modifier.clickable(onClick = onClick),
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(28.dp),
         color = if (selected) MaterialTheme.colorScheme.secondary.copy(alpha = 0.35f)
         else MaterialTheme.colorScheme.surfaceVariant
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            modifier = Modifier.fillMaxHeight().
+            padding(horizontal = 18.dp, vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp))
-            Text(text = label, style = MaterialTheme.typography.bodySmall)
+            Text(text = label, style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.Medium,
+                maxLines = 2
+            )
         }
     }
 }

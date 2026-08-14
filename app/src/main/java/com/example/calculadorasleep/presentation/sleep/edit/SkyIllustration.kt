@@ -25,11 +25,6 @@ import com.example.calculadorasleep.ui.theme.SunRays
 import kotlin.math.cos
 import kotlin.math.sin
 
-/**
- * Ilustración de fondo tipo "sky" para el header: sol con rayos cuando el modo
- * es despertar, luna creciente con estrellas cuando el modo es dormir.
- * Dibujada 100% con Canvas — sin emojis ni imágenes externas.
- */
 @Composable
 fun SkyIllustration(
     mode: SleepCalculationMode,
