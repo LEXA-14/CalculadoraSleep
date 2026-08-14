@@ -13,11 +13,12 @@ sealed class Screen : NavKey {
     data object Register : Screen()
 
     @Serializable
-    object AlarmList : Screen()
+    data object AlarmList : Screen()
 
     @Serializable
-    object Home : Screen()
+    data class Home(val alarmId: Int = 0) : Screen()
+
     @Serializable
-    object History: Screen()
+    data object History : Screen()
 
 }
