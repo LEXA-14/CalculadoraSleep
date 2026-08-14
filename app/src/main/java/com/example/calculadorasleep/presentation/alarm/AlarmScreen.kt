@@ -53,12 +53,12 @@ import com.example.calculadorasleep.presentation.auth.Logout.LogoutButton
 fun AlarmScreen (
     viewModel: AlarmViewModel = hiltViewModel(),
     onAddAlarm: () -> Unit,
-    onLogout:()-> Unit
-
+    onLogout:()-> Unit,
+    onEditAlarm: (Int) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     RequestNotificationPermission()
-    AlarmListBody(state, viewModel::onEvent, onAddAlarm,onLogout)
+    AlarmListBody(state, viewModel::onEvent, onAddAlarm, onLogout, onEditAlarm)
 }
 
 @Composable
@@ -88,8 +88,8 @@ fun AlarmListBody(
     state: AlarmUiState,
     onEvent: (AlarmUiEvent) -> Unit,
     onAddAlarm: () -> Unit,
-    onLogout: () -> Unit
-
+    onLogout: () -> Unit,
+    onEditAlarm: (Int) -> Unit
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -183,6 +183,7 @@ fun AlarmListBody(
                                     onEvent(AlarmUiEvent.ToggleAlarm(alarm, isEnabled))
                                 },
                                 onItemClick = {
+                                    onEditAlarm(alarm.alarmId)
                                 }
                             )
                         }
@@ -246,7 +247,7 @@ fun AlarmItem(
     onItemClick: () -> Unit
 ) {
     ElevatedCard(
-        onItemClick,
+        onClick = onItemClick,
         modifier = Modifier
             .fillMaxWidth()
             .testTag("alarm_item_${alarm.alarmId}")
@@ -301,7 +302,7 @@ private fun AlarmListBodyPreview() {
                 Alarm(alarmId = 2, time = kotlinx.datetime.LocalTime(8, 0), isEnabled = false, label = "Trabajo")
             )
         )
-        AlarmListBody(state, {}, {},{})
+        AlarmListBody(state, {}, {}, {}, {})
     }
 }
 
