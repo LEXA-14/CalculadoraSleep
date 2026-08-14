@@ -54,9 +54,7 @@ import com.example.calculadorasleep.domain.sleep.UseCases.SleepCalculationMode
 import com.example.calculadorasleep.domain.sleep.UseCases.SleepTimeOption
 import com.example.calculadorasleep.presentation.auth.Logout.LogoutDialog
 import com.example.calculadorasleep.presentation.auth.Logout.LogoutViewModel
-
 import com.example.calculadorasleep.ui.theme.CalculadoraSleepTheme
-import com.example.calculadorasleep.ui.theme.CreamGelato
 import kotlinx.coroutines.launch
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
@@ -352,8 +350,8 @@ private fun PeriodButton(
             .clickable(onClick = onClick)
             .testTag(testTag),
         shape = RoundedCornerShape(12.dp),
-        color = if (selected) MaterialTheme.colorScheme.tertiary
-        else CreamGelato,
+        color = if (selected) MaterialTheme.colorScheme.primary
+        else MaterialTheme.colorScheme.surfaceVariant,
         border = if (!selected) BorderStroke(1.dp, MaterialTheme.colorScheme.outline) else null
     ) {
         Text(
@@ -361,7 +359,7 @@ private fun PeriodButton(
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
             fontWeight = FontWeight.Bold,
             color = if (selected) MaterialTheme.colorScheme.onPrimary
-            else MaterialTheme.colorScheme.onSurface
+            else MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
