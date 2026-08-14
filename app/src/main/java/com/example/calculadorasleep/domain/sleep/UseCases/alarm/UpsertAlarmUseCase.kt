@@ -1,22 +1,25 @@
 package com.example.calculadorasleep.domain.sleep.UseCases.alarm
 
+import com.example.calculadorasleep.domain.sleep.Validation.validateLabel
+import com.example.calculadorasleep.domain.sleep.Validation.validateTime
 import com.example.calculadorasleep.domain.sleep.model.Alarm
 import com.example.calculadorasleep.domain.sleep.repository.AlarmRepository
-import com.example.calculadorasleep.presentation.alarm.AlarmScheduler
 import javax.inject.Inject
 
 class UpsertAlarmUseCase @Inject constructor(
     private val alarmRepository: AlarmRepository,
-    private val alarmScheduler: AlarmScheduler
 ) {
-    suspend operator fun invoke(alarm: Alarm): Result<Unit> {
-        return runCatching {
-            alarmRepository.upsert(alarm)
-            if (alarm.isEnabled) {
-                alarmScheduler.schedule(alarm)
-            } else {
-                alarmScheduler.cancel(alarm)
-            }
+    suspend operator fun invoke(alarm: Alarm): Result<Int> {
+        val labelResult = validateLabel(alarm.label)
+        if (!labelResult.isValid) {
+            return Result.failure(IllegalArgumentException(labelResult.error))
         }
+
+        val timeResult = validateTime(alarm.time.hour, alarm.time.minute)
+        if (!timeResult.isValid) {
+            return Result.failure(IllegalArgumentException(timeResult.error))
+        }
+
+        return runCatching { alarmRepository.upsert(alarm) }
     }
 }
