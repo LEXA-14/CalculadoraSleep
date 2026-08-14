@@ -20,7 +20,8 @@ private val DarkColorScheme = darkColorScheme(
     surface = Color(0xFF242424),
     onPrimary = TextDark,
     onBackground = CreamGelato,
-    onSurface = CreamGelato
+    onSurface = CreamGelato,
+    onSurfaceVariant = CreamGelato
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -40,6 +41,7 @@ private val LightColorScheme = lightColorScheme(
     onSurface = TextDark,
 
     surfaceVariant = Color.White,
+    onSurfaceVariant = TextDark,
     outline = OutlineColor
 )
 

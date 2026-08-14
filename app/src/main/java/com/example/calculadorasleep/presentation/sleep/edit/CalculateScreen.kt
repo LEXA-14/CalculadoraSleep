@@ -104,11 +104,27 @@ fun CalculateBody(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp)
         ) {
-            Spacer(Modifier.height(8.dp))
-            CalculateTopBar(onLogout=onLogout)
+            Box(modifier = Modifier.fillMaxWidth()) {
+                SkyIllustration(
+                    mode = state.mode,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(140.dp)
+                        .align(Alignment.TopCenter)
+                )
+                Column {
+                    Spacer(Modifier.height(8.dp))
+                    CalculateTopBar(onLogout = onLogout)
 
-            Spacer(Modifier.height(16.dp))
-            ModeSelector(mode = state.mode, onEvent = onEvent)
+                    Spacer(Modifier.height(16.dp))
+                    ModeSelector(mode = state.mode, onEvent = onEvent)
+                }
+            }
+//            Spacer(Modifier.height(8.dp))
+//            CalculateTopBar(onLogout=onLogout)
+//
+//            Spacer(Modifier.height(16.dp))
+//            ModeSelector(mode = state.mode, onEvent = onEvent)
 
             Spacer(Modifier.height(16.dp))
             Text(
@@ -271,7 +287,10 @@ private fun TimePickerCard(state: CalculateState, onEvent: (CalculateEvent) -> U
                     testTag = "stepper_hour",
                     onChange = { onEvent(CalculateEvent.HourChanged(it)) }
                 )
-                Text(":", style = MaterialTheme.typography.displayMedium, fontWeight = FontWeight.Bold)
+                Text(":",
+                    style = MaterialTheme.typography.displayMedium,
+                    fontWeight = FontWeight.Bold,
+                    color=MaterialTheme.colorScheme.onSurfaceVariant)
                 NumberStepper(
                     value = state.minute,
                     range = 0..59,
@@ -312,7 +331,8 @@ private fun NumberStepper(
         Text(
             text = value.toString().padStart(2, '0'),
             style = MaterialTheme.typography.displayMedium,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color=MaterialTheme.colorScheme.onSurfaceVariant
         )
         IconButton(onClick = { step(-1) }, modifier = Modifier.testTag("${testTag}_down")) {
             Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Disminuir")
