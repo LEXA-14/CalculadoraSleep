@@ -272,6 +272,7 @@ private fun TimePickerCard(state: CalculateState, onEvent: (CalculateEvent) -> U
         shape = RoundedCornerShape(20.dp),
         color = MaterialTheme.colorScheme.surfaceVariant,
         shadowElevation = 3.dp,
+        border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.tertiary),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(
