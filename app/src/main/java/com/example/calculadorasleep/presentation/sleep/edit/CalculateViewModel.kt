@@ -150,14 +150,24 @@ class CalculateViewModel @Inject constructor(
                 )
             ).onSuccess {
                 val kotlinxTime = kotlinx.datetime.LocalTime(option.time.hour, option.time.minute)
+
                 val alarmToSave = Alarm(
                     alarmId = if (current.isNew) 0 else current.alarmId,
                     time = kotlinxTime,
                     isEnabled = true,
                     label = "Alarma de Ciclo (${option.ciclos} ciclos)"
                 )
-                alarmRepository.upsert(alarmToSave)
-                alarmScheduler.schedule(alarmToSave)
+
+                val savedAlarmId = alarmRepository.upsert(alarmToSave)
+
+                val finalAlarm = if (current.isNew && savedAlarmId > 0) {
+                    alarmToSave.copy(alarmId = savedAlarmId.toInt())
+                } else {
+                    alarmToSave
+                }
+
+                alarmScheduler.schedule(finalAlarm)
+
                 _state.update { it.copy(isSaving = false, message = "Guardado") }
                 kotlinx.coroutines.delay(800)
                 _state.update { it.copy(saved = true) }
@@ -172,7 +182,15 @@ class CalculateViewModel @Inject constructor(
         if (current.alarmId <= 0) return
         viewModelScope.launch {
             _state.update { it.copy(isDeleting = true, error = null) }
+
+            val alarmToDelete = alarmRepository.getAlarm(current.alarmId)
+
             alarmRepository.delete(current.alarmId)
+
+            if (alarmToDelete != null) {
+                alarmScheduler.cancel(alarmToDelete)
+            }
+
             _state.update { it.copy(isDeleting = false, deleted = true) }
         }
     }
