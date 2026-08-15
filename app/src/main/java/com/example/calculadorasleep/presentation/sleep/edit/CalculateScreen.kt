@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +28,7 @@ import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +38,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -90,6 +93,7 @@ fun CalculateScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalculateBody(
     state: CalculateState,
@@ -107,7 +111,23 @@ fun CalculateBody(
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Deep Sleep",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                },
+                actions = {
+                    CalculateTopBarActions(onLogout = onLogout)
+                }
+            )
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { padding ->
         Column(
             modifier = Modifier
@@ -116,24 +136,10 @@ fun CalculateBody(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp)
         ) {
-            Box(modifier = Modifier.fillMaxWidth()) {
-                SkyIllustration(
-                    mode = state.mode,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(140.dp)
-                        .align(Alignment.TopCenter)
-                )
-                Column {
-                    Spacer(Modifier.height(8.dp))
-                    CalculateTopBar(onLogout = onLogout)
+            Spacer(Modifier.height(2.dp))
+            ModeSelector(mode = state.mode, onEvent = onEvent)
 
-                    Spacer(Modifier.height(16.dp))
-                    ModeSelector(mode = state.mode, onEvent = onEvent)
-                }
-            }
-
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(12.dp))
             Text(
                 text = if (state.mode == SleepCalculationMode.WAKE_UP_AT)
                     "Hora de despertar" else "Hora de dormir",
@@ -141,10 +147,10 @@ fun CalculateBody(
                 color = MaterialTheme.colorScheme.tertiary
             )
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(6.dp))
             TimePickerCard(state = state, onEvent = onEvent)
 
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(16.dp))
             Button(
                 onClick = { onEvent(CalculateEvent.Calculate) },
                 modifier = Modifier
@@ -158,7 +164,7 @@ fun CalculateBody(
             }
 
             if (state.options.isNotEmpty()) {
-                Spacer(Modifier.height(28.dp))
+                Spacer(Modifier.height(20.dp))
                 Text(
                     text = if (state.mode == SleepCalculationMode.WAKE_UP_AT)
                         "Mejores horas para dormir" else "Mejores horas para despertar",
@@ -168,8 +174,8 @@ fun CalculateBody(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(Modifier.height(16.dp))
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Spacer(Modifier.height(12.dp))
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     state.options.forEach { option ->
                         SleepOptionCard(
                             option = option,
@@ -179,7 +185,7 @@ fun CalculateBody(
                     }
                 }
 
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(16.dp))
                 Button(
                     onClick = { onEvent(CalculateEvent.Save) },
                     modifier = Modifier
@@ -192,7 +198,7 @@ fun CalculateBody(
                 }
 
                 if (!state.isNew) {
-                    Spacer(Modifier.height(12.dp))
+                    Spacer(Modifier.height(10.dp))
                     OutlinedButtonCustom(
                         onClick = { showDeleteDialog = true },
                         modifier = Modifier
@@ -204,7 +210,7 @@ fun CalculateBody(
                 }
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(20.dp))
         }
     }
 
@@ -233,6 +239,36 @@ fun CalculateBody(
 }
 
 @Composable
+private fun CalculateTopBarActions(
+    onLogout: () -> Unit,
+    logoutViewModel: LogoutViewModel = hiltViewModel()
+) {
+    var showLogoutDialog by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+    IconButton(onClick = { showLogoutDialog = true }) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.Logout,
+            contentDescription = "Cerrar sesión",
+            tint = MaterialTheme.colorScheme.onBackground
+        )
+    }
+
+    if (showLogoutDialog) {
+        LogoutDialog(
+            onDismiss = { showLogoutDialog = false },
+            onConfirm = {
+                showLogoutDialog = false
+                scope.launch {
+                    logoutViewModel.logout()
+                    onLogout()
+                }
+            }
+        )
+    }
+}
+
+@Composable
 private fun OutlinedButtonCustom(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -248,46 +284,6 @@ private fun OutlinedButtonCustom(
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
             content()
         }
-    }
-}
-
-@Composable
-private fun CalculateTopBar(
-    onLogout: () -> Unit,
-    logoutViewModel: LogoutViewModel = hiltViewModel()
-) {
-    var showLogoutDialog by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "Deep Sleep",
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-        IconButton(onClick = { showLogoutDialog = true }) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.Logout,
-                contentDescription = "Cerrar sesión",
-                tint = MaterialTheme.colorScheme.onBackground
-            )
-        }
-    }
-    if (showLogoutDialog) {
-        LogoutDialog(
-            onDismiss = { showLogoutDialog = false },
-            onConfirm = {
-                showLogoutDialog = false
-                scope.launch {
-                    logoutViewModel.logout()
-                    onLogout()
-                }
-            }
-        )
     }
 }
 
@@ -335,7 +331,7 @@ private fun ModeChip(
         Row(
             modifier = Modifier
                 .fillMaxHeight()
-                .padding(horizontal = 18.dp, vertical = 16.dp),
+                .padding(horizontal = 18.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
@@ -360,7 +356,7 @@ private fun TimePickerCard(state: CalculateState, onEvent: (CalculateEvent) -> U
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(
-            modifier = Modifier.padding(24.dp),
+            modifier = Modifier.padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -384,7 +380,7 @@ private fun TimePickerCard(state: CalculateState, onEvent: (CalculateEvent) -> U
                 )
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(12.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 PeriodButton("AM", state.isAm, "btn_am") { onEvent(CalculateEvent.PeriodChanged(true)) }
                 PeriodButton("PM", !state.isAm, "btn_pm") { onEvent(CalculateEvent.PeriodChanged(false)) }
@@ -471,7 +467,7 @@ private fun SleepOptionCard(option: SleepTimeOption, selected: Boolean, onClick:
             else -> null
         }
     ) {
-        Box(modifier = Modifier.padding(16.dp)) {
+        Box(modifier = Modifier.padding(14.dp)) {
             if (option.esIdeal) {
                 Surface(
                     shape = RoundedCornerShape(8.dp),
@@ -494,7 +490,7 @@ private fun SleepOptionCard(option: SleepTimeOption, selected: Boolean, onClick:
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.tertiary
                 )
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(2.dp))
                 Text("• ${option.ciclos} ciclos de sueño", style = MaterialTheme.typography.bodySmall)
                 Text(
                     text = "${formatHoras(option.duracionHoras)} de descanso" +
