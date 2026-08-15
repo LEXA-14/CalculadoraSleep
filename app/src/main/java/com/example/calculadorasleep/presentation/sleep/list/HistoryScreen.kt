@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.NightsStay
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +27,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -49,23 +52,19 @@ import java.util.Locale
 @Composable
 fun HistoryScreen(
     viewModel: HistoryViewModel = hiltViewModel(),
-    onLogout:()-> Unit,
-
+    onLogout: () -> Unit,
 ) {
-
-
     val state by viewModel.state.collectAsStateWithLifecycle()
-    HistoryBody(state = state, onEvent = viewModel::onEvent, onLogout=onLogout)
+    HistoryBody(state = state, onEvent = viewModel::onEvent, onLogout = onLogout)
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryBody(
     state: HistoryUiState,
     onEvent: (HistoryUiEvent) -> Unit,
     onLogout: () -> Unit,
 ) {
-
-
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(state.message, state.error) {
@@ -76,7 +75,24 @@ fun HistoryBody(
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Historial de sueño",
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    )
+                },
+                actions = {
+                    LogoutButton(onLogout = onLogout)
+                }
+            )
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { padding ->
         Column(
             modifier = Modifier
@@ -84,20 +100,10 @@ fun HistoryBody(
                 .fillMaxSize()
                 .padding(horizontal = 20.dp)
         ) {
-            Spacer(Modifier.height(16.dp))
-
-            Text(
-                text = "Historial de sueño",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-            LogoutButton(onLogout=onLogout)
-
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(2.dp))
             StatsCard(stats = state.stats)
 
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(12.dp))
 
             when {
                 state.isLoading -> {
@@ -118,14 +124,12 @@ fun HistoryBody(
 
                 else -> {
                     LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         items(items = state.registros, key = { it.sleepId }) { sleep ->
                             SleepHistoryItem(
                                 sleep = sleep,
-                                onDelete = { onEvent(HistoryUiEvent.Delete(sleep))
-
-                                }
+                                onDelete = { onEvent(HistoryUiEvent.Delete(sleep)) }
                             )
                         }
                         item { Spacer(Modifier.height(16.dp)) }
@@ -172,7 +176,6 @@ private fun StatItem(label: String, value: String) {
 private fun SleepHistoryItem(
     sleep: Sleep,
     onDelete: () -> Unit,
-
 ) {
     val timeFormatter = remember { DateTimeFormatter.ofPattern("hh:mm a", Locale.getDefault()) }
     val dateFormatter = remember { DateTimeFormatter.ofPattern("dd MMM", Locale.getDefault()) }
@@ -196,7 +199,7 @@ private fun SleepHistoryItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -234,6 +237,7 @@ private fun SleepHistoryItem(
         }
     }
 }
+
 @Preview
 @Composable
 private fun HistoryBodyPreview() {
