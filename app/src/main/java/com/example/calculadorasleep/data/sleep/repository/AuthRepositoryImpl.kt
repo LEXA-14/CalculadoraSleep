@@ -1,6 +1,13 @@
 package com.example.calculadorasleep.data.sleep.repository
 
+import android.content.Context
+import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialRequest
+import com.example.calculadorasleep.R
 import com.example.calculadorasleep.domain.sleep.repository.AuthRepository
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
@@ -8,7 +15,8 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
-    private val auth: FirebaseAuth
+    private val auth: FirebaseAuth,
+    private val credentialManager: CredentialManager
 ) : AuthRepository {
 
     override suspend fun login(email: String, password: String): Result<Boolean> {
@@ -37,13 +45,31 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun signInWithGoogle(idToken: String): Result<Boolean> {
+    override suspend fun signInWithGoogle(context: Context): Result<Boolean> {
         return try {
-            val credential = GoogleAuthProvider.getCredential(idToken, null)
-            auth.signInWithCredential(credential).await()
-            auth.currentUser?.reload()?.await()
+            val serverClientId = context.getString(R.string.web_client_id)
+            val googleIdOption = GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(false)
+                .setServerClientId(serverClientId)
+                .setAutoSelectEnabled(false)
+                .build()
 
-            Result.success(true)
+            val request = GetCredentialRequest.Builder()
+                .addCredentialOption(googleIdOption)
+                .build()
+
+            val result = credentialManager.getCredential(context, request)
+            val credential = result.credential
+
+            if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                val idToken = googleIdTokenCredential.idToken
+                val authCredential = GoogleAuthProvider.getCredential(idToken, null)
+                auth.signInWithCredential(authCredential).await()
+                Result.success(true)
+            } else {
+                Result.failure(Exception("No valid credential found"))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }
