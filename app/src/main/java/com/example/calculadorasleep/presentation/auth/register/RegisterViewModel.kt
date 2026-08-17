@@ -1,5 +1,6 @@
 package com.example.calculadorasleep.presentation.auth.register
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.calculadorasleep.domain.sleep.UseCases.auth.GoogleSignInUseCase
@@ -26,7 +27,7 @@ class RegisterViewModel @Inject constructor(
             is RegisterUiEvent.EmailChanged -> _state.update { it.copy(email = event.value, error = null) }
             is RegisterUiEvent.PasswordChanged -> _state.update { it.copy(password = event.value, error = null) }
             RegisterUiEvent.RegisterSubmit -> registerWithEmail()
-            is RegisterUiEvent.GoogleSignInSubmit -> loginWithGoogle(event.idToken)
+            is RegisterUiEvent.GoogleSignInSubmit -> loginWithGoogle(event.context)
             RegisterUiEvent.ClearError -> _state.update { it.copy(error = null) }
         }
     }
@@ -53,10 +54,10 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    private fun loginWithGoogle(idToken: String) {
+    private fun loginWithGoogle(context: Context) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
-            val result = googleSignInUseCase(idToken)
+            val result = googleSignInUseCase(context)
             result.onSuccess {
                 _state.update { it.copy(isLoading = false, isSuccess = true) }
             }.onFailure { error ->
