@@ -74,7 +74,7 @@ class GetSleepStatsUseCase @Inject constructor(
             if (registros.isEmpty()) return@map SleepStats.vacio()
 
             val duracionPromedioMin=registros.map {
-                (it.despertarTiempo-it.dormirTiempo)/ 6000
+                (it.despertarTiempo-it.dormirTiempo)/ 60000
             }.average().toInt()
 
             val ciclosPromedio=registros.map { it.ciclos }.average()
