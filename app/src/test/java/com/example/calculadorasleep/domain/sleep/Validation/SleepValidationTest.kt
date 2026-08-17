@@ -41,6 +41,25 @@ class SleepValidationTest {
     }
 
 
+    @Test
+    fun `validateCalidad null es valido porque es opcional`() {
+        val result = validateCalidad(null)
+        assertTrue(result.isValid)
+    }
+    @Test
+    fun `validateCalidad fuera de rango 1 a 5 es invalido`() {
+        assertFalse(validateCalidad(0).isValid)
+        assertFalse(validateCalidad(6).isValid)
+        assertFalse(validateCalidad(-1).isValid)
+    }
+    @Test
+    fun `validateCalidad dentro de rango 1 a 5 es valido`() {
+        for (valor in 1..5) {
+            assertTrue("calidad=$valor deberia ser valida", validateCalidad(valor).isValid)
+        }
+    }
+
+
 
 
 
