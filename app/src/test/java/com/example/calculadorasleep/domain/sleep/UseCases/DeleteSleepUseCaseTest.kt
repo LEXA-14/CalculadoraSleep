@@ -11,11 +11,11 @@ import org.junit.Test
 
 class DeleteSleepUseCaseTest {
     private lateinit var repository: SleepRepository
-    private lateinit var useCase: SaveSleepUseCase
+    private lateinit var useCase: DeleteSleepUseCase
     @Before
     fun setUp() {
         repository = mockk(relaxed = true)
-        useCase = SaveSleepUseCase(repository)
+        useCase = DeleteSleepUseCase(repository)
     }
     @Test
     fun `delega la eliminacion al repositorio`() = runTest {
