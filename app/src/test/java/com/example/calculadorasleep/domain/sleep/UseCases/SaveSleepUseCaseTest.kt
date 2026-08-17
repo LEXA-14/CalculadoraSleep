@@ -10,7 +10,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.capture
 
 class SaveSleepUseCaseTest {
     private lateinit var repository: SleepRepository
