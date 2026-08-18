@@ -13,6 +13,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.calculadorasleep.navigation.SleepNavDisplay
 import com.example.calculadorasleep.presentation.darkMode.ThemeViewModel
 import com.example.calculadorasleep.ui.theme.CalculadoraSleepTheme
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -20,12 +21,16 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val isUserLoggedIn = currentUser != null
+
         setContent {
             val themeViewModel: ThemeViewModel= hiltViewModel()
             val isDarkMode by themeViewModel.isDarkMode.collectAsStateWithLifecycle()
             CalculadoraSleepTheme (darkTheme = isDarkMode){
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    SleepNavDisplay()
+                    SleepNavDisplay(isLoggedIn = isUserLoggedIn)
                 }
             }
         }
