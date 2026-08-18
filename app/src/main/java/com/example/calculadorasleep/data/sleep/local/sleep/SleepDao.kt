@@ -21,7 +21,7 @@ interface SleepDao {
     @Query("SELECT * FROM sleep where userId = :userId ORDER BY dormirTiempo DESC")
     fun getAll(userId: String): Flow<List<SleepEntity>>
 
-    @Query("SELECT * FROM sleep WHERE  userId and dormirTiempo >= :sinceMillis ORDER BY dormirTiempo DESC")
+    @Query("SELECT * FROM sleep WHERE userId =:userId and dormirTiempo >= :sinceMillis ORDER BY dormirTiempo DESC")
     fun getSince(userId: String,sinceMillis: Long): Flow<List<SleepEntity>>
 
     @Query("SELECT * FROM sleep WHERE sleepId = :id")
