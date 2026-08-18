@@ -25,7 +25,6 @@ import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.WbSunny
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,7 +36,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -68,19 +66,14 @@ import java.util.Locale
 
 @Composable
 fun CalculateScreen(
-    alarmId: Int,
     onBack: () -> Unit,
     onLogout: () -> Unit,
     viewModel: CalculateViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    LaunchedEffect(alarmId) {
-        viewModel.onEvent(CalculateEvent.Load(alarmId))
-    }
-
-    LaunchedEffect(state.saved, state.deleted) {
-        if (state.saved || state.deleted) {
+    LaunchedEffect(state.saved) {
+        if (state.saved) {
             onBack()
             viewModel.onEvent(CalculateEvent.ClearMessage)
         }
@@ -101,7 +94,6 @@ fun CalculateBody(
     onLogout: () -> Unit
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
-    var showDeleteDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(state.message, state.error) {
         (state.message ?: state.error)?.let {
@@ -194,47 +186,11 @@ fun CalculateBody(
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
                 ) {
-                    Text(if (state.isNew) "GUARDAR" else "ACTUALIZAR", fontWeight = FontWeight.Bold)
-                }
-
-                if (!state.isNew) {
-                    Spacer(Modifier.height(10.dp))
-                    OutlinedButtonCustom(
-                        onClick = { showDeleteDialog = true },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(52.dp)
-                    ) {
-                        Text("ELIMINAR", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.error)
-                    }
+                    Text("GUARDAR", fontWeight = FontWeight.Bold)
                 }
             }
-
             Spacer(Modifier.height(20.dp))
         }
-    }
-
-    if (showDeleteDialog) {
-        AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Eliminar alarma") },
-            text = { Text("¿Estás seguro de que deseas eliminar esta alarma?") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showDeleteDialog = false
-                        onEvent(CalculateEvent.Delete)
-                    }
-                ) {
-                    Text("Sí, eliminar", color = MaterialTheme.colorScheme.error)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancelar")
-                }
-            }
-        )
     }
 }
 
@@ -265,25 +221,6 @@ private fun CalculateTopBarActions(
                 }
             }
         )
-    }
-}
-
-@Composable
-private fun OutlinedButtonCustom(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
-) {
-    Surface(
-        onClick = onClick,
-        modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
-    ) {
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-            content()
-        }
     }
 }
 
@@ -459,11 +396,15 @@ private fun SleepOptionCard(option: SleepTimeOption, selected: Boolean, onClick:
             .clickable(onClick = onClick)
             .testTag("option_card_${option.ciclos}"),
         shape = RoundedCornerShape(16.dp),
-        color = if (option.esIdeal) MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
-        else MaterialTheme.colorScheme.surfaceVariant,
+        color = when {
+            selected -> if (option.esIdeal) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                       else MaterialTheme.colorScheme.secondary.copy(alpha = 0.15f)
+            else -> MaterialTheme.colorScheme.surfaceVariant
+        },
         border = when {
-            option.esIdeal -> BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary)
-            selected -> BorderStroke(1.5.dp, MaterialTheme.colorScheme.secondary)
+            selected -> if (option.esIdeal) BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
+                       else BorderStroke(2.dp, MaterialTheme.colorScheme.secondary)
+            option.esIdeal -> BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
             else -> null
         }
     ) {

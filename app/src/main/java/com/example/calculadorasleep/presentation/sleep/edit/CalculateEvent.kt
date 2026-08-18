@@ -4,7 +4,6 @@ import com.example.calculadorasleep.domain.sleep.UseCases.SleepCalculationMode
 import com.example.calculadorasleep.domain.sleep.UseCases.SleepTimeOption
 
 sealed interface CalculateEvent {
-    data class Load(val id: Int?) : CalculateEvent
     data class ModeChanged(val mode: SleepCalculationMode) : CalculateEvent
     data class HourChanged(val hour: Int) : CalculateEvent
     data class MinuteChanged(val minute: Int) : CalculateEvent
@@ -12,6 +11,5 @@ sealed interface CalculateEvent {
     data object Calculate : CalculateEvent
     data class SelectOption(val option: SleepTimeOption) : CalculateEvent
     data object Save : CalculateEvent
-    data object Delete : CalculateEvent
     data object ClearMessage : CalculateEvent
 }

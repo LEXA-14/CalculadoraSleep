@@ -36,7 +36,6 @@ class CalculateViewModel @Inject constructor(
 
     fun onEvent(event: CalculateEvent) {
         when (event) {
-            is CalculateEvent.Load -> loadAlarm(event.id)
             is CalculateEvent.ModeChanged -> {
                 themeState.setDarkMode(event.mode == SleepCalculationMode.SLEEP_AT)
                 _state.update { it.copy(mode = event.mode, options = emptyList()) }
@@ -50,62 +49,8 @@ class CalculateViewModel @Inject constructor(
             CalculateEvent.Calculate -> onCalculate()
             is CalculateEvent.SelectOption -> onSelectOption(event.option)
             CalculateEvent.Save -> onSave()
-            CalculateEvent.Delete -> onDelete()
             CalculateEvent.ClearMessage ->
-                _state.update { it.copy(message = null, error = null, saved = false, deleted = false) }
-        }
-    }
-
-    private fun loadAlarm(id: Int?) {
-        _state.update {
-            it.copy(
-                saved = false,
-                deleted = false,
-                message = null,
-                isSaving = false,
-                isDeleting = false
-            )
-        }
-
-        if (id == null || id <= 0) {
-            _state.value = CalculateState()
-            return
-        }
-
-        viewModelScope.launch {
-            val alarm = alarmRepository.getAlarm(id)
-            if (alarm != null) {
-                val hour24 = alarm.time.hour
-                val minute = alarm.time.minute
-                val isAm = hour24 < 12
-                val hour12 = when {
-                    hour24 == 0 -> 12
-                    hour24 > 12 -> hour24 - 12
-                    else -> hour24
-                }
-
-                val targetTime = java.time.LocalTime.of(hour24, minute)
-                val options = calculateSleepTimesUseCase(targetTime, _state.value.mode)
-                val matchingOption = options.firstOrNull {
-                    it.time.hour == hour24 && it.time.minute == minute
-                } ?: options.firstOrNull()
-
-                _state.update {
-                    it.copy(
-                        alarmId = alarm.alarmId,
-                        hour = hour12,
-                        minute = minute,
-                        isAm = isAm,
-                        targetTime = targetTime,
-                        options = options,
-                        selectedOption = matchingOption,
-                        isNew = false,
-                        error = null
-                    )
-                }
-            } else {
-                _state.value = CalculateState()
-            }
+                _state.update { it.copy(message = null, error = null, saved = false) }
         }
     }
 
@@ -117,14 +62,17 @@ class CalculateViewModel @Inject constructor(
             it.copy(
                 targetTime = targetTime,
                 options = options,
-                selectedOption = options.find { opt -> opt.esIdeal } ?: options.firstOrNull(),
+                selectedOption = null,
                 error = null
             )
         }
     }
 
     private fun onSelectOption(option: SleepTimeOption) {
-        _state.update { it.copy(selectedOption = option) }
+        _state.update {
+            val newSelection = if (it.selectedOption == option) null else option
+            it.copy(selectedOption = newSelection)
+        }
     }
 
     private fun onSave() {
@@ -150,22 +98,14 @@ class CalculateViewModel @Inject constructor(
                 )
             ).onSuccess {
                 val kotlinxTime = kotlinx.datetime.LocalTime(option.time.hour, option.time.minute)
-
                 val alarmToSave = Alarm(
-                    alarmId = if (current.isNew) 0 else current.alarmId,
+                    alarmId = 0,
                     time = kotlinxTime,
                     isEnabled = true,
                     label = "Alarma de Ciclo (${option.ciclos} ciclos)"
                 )
-
                 val savedAlarmId = alarmRepository.upsert(alarmToSave)
-
-                val finalAlarm = if (current.isNew && savedAlarmId > 0) {
-                    alarmToSave.copy(alarmId = savedAlarmId.toInt())
-                } else {
-                    alarmToSave
-                }
-
+                val finalAlarm = alarmToSave.copy(alarmId = if (savedAlarmId > 0) savedAlarmId else 0)
                 alarmScheduler.schedule(finalAlarm)
 
                 _state.update { it.copy(isSaving = false, message = "Guardado") }
@@ -174,24 +114,6 @@ class CalculateViewModel @Inject constructor(
             }.onFailure { e ->
                 _state.update { it.copy(isSaving = false, error = e.message) }
             }
-        }
-    }
-
-    private fun onDelete() {
-        val current = _state.value
-        if (current.alarmId <= 0) return
-        viewModelScope.launch {
-            _state.update { it.copy(isDeleting = true, error = null) }
-
-            val alarmToDelete = alarmRepository.getAlarm(current.alarmId)
-
-            alarmRepository.delete(current.alarmId)
-
-            if (alarmToDelete != null) {
-                alarmScheduler.cancel(alarmToDelete)
-            }
-
-            _state.update { it.copy(isDeleting = false, deleted = true) }
         }
     }
 }
