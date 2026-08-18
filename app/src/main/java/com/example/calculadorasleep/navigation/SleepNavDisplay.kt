@@ -18,7 +18,7 @@ import com.example.calculadorasleep.presentation.quality.SleepQualityScreen
 
 @Composable
 fun SleepNavDisplay(isLoggedIn: Boolean = false) {
-    val startScreen = if (isLoggedIn) Screen.AlarmList else Screen.Login
+    val startScreen = if (isLoggedIn) Screen.Home else Screen.Login
     val backStack = rememberNavBackStack(startScreen)
     val currentScreen = backStack.lastOrNull()
     val showBottomBar = currentScreen is Screen.Home ||
