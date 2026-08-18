@@ -33,6 +33,11 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".presentation.quality.SleepQualityActivity"
+            android:exported="false"
+            android:theme="@style/Theme.CalculadoraSleep" />
+
         <receiver
             android:name=".data.sleep.alarm.AlarmReceiver"
             android:enabled="true"
