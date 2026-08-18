@@ -21,4 +21,7 @@ sealed class Screen : NavKey {
     @Serializable
     data object History : Screen()
 
+    @Serializable
+    data object SleepQuality : Screen()
+
 }

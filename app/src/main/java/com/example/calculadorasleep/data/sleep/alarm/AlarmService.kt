@@ -14,6 +14,7 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.example.calculadorasleep.MainActivity
 import com.example.calculadorasleep.R
+import com.example.calculadorasleep.presentation.quality.SleepQualityActivity
 
 class AlarmService : Service() {
     private var mediaPlayer: MediaPlayer? = null
@@ -49,6 +50,7 @@ class AlarmService : Service() {
         }
 
         createNotificationChannel()
+
         val stopIntent = Intent(this, AlarmService::class.java).apply {
             action = ACTION_STOP
         }
@@ -97,6 +99,13 @@ class AlarmService : Service() {
             it.release()
         }
         mediaPlayer = null
+
+        val qualityIntent = Intent(this, SleepQualityActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        }
+        startActivity(qualityIntent)
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             stopForeground(STOP_FOREGROUND_REMOVE)
         } else {
@@ -107,7 +116,13 @@ class AlarmService : Service() {
     }
 
     override fun onDestroy() {
-        stopAlarm()
+        mediaPlayer?.let {
+            if (it.isPlaying) {
+                it.stop()
+            }
+            it.release()
+        }
+        mediaPlayer = null
         super.onDestroy()
     }
 

@@ -1,4 +1,4 @@
-package com.example.calculadorasleep
+package com.example.calculadorasleep.presentation.quality
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -6,26 +6,21 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.calculadorasleep.navigation.SleepNavDisplay
-import com.example.calculadorasleep.presentation.darkMode.ThemeViewModel
 import com.example.calculadorasleep.ui.theme.CalculadoraSleepTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class SleepQualityActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val themeViewModel: ThemeViewModel= hiltViewModel()
-            val isDarkMode by themeViewModel.isDarkMode.collectAsStateWithLifecycle()
-            CalculadoraSleepTheme (darkTheme = isDarkMode){
+            CalculadoraSleepTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    SleepNavDisplay()
+                    SleepQualityScreen(
+                        onNavigateBack = { finish() }
+                    )
                 }
             }
         }

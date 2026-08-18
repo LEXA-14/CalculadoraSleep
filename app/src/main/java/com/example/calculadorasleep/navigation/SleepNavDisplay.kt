@@ -15,9 +15,8 @@ import com.example.calculadorasleep.presentation.sleep.edit.CalculateScreen
 import com.example.calculadorasleep.presentation.sleep.list.HistoryScreen
 
 @Composable
-fun SleepNavDisplay(openDirectlyToAlarms: Boolean = false) {
-    val startScreen = if (openDirectlyToAlarms) Screen.Home(0) else Screen.Login
-    val backStack = rememberNavBackStack(startScreen)
+fun SleepNavDisplay() {
+    val backStack = rememberNavBackStack(Screen.Login)
     val currentScreen = backStack.lastOrNull()
     val showBottomBar = currentScreen is Screen.Home ||
             currentScreen is Screen.AlarmList ||
