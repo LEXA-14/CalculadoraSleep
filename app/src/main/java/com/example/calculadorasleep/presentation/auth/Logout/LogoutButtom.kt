@@ -13,6 +13,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.launch
 
@@ -23,14 +25,15 @@ fun LogoutButton(
 ) {
     var showDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-
-    IconButton(onClick = { showDialog = true }) {
+    IconButton(
+        onClick = { showDialog = true },
+        modifier = Modifier.testTag("logout_button")
+    ) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.Logout,
             contentDescription = "Cerrar sesión"
         )
     }
-
     if (showDialog) {
         LogoutDialog(
             onDismiss = { showDialog = false },
@@ -44,6 +47,7 @@ fun LogoutButton(
         )
     }
 }
+
 @Composable
 fun LogoutDialog(
     onDismiss: () -> Unit,
@@ -51,18 +55,24 @@ fun LogoutDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
+        modifier = Modifier.testTag("logout_dialog"),
         title = { Text(text = "Cerrar sesión") },
         text = { Text(text = "¿Estás seguro de que deseas cerrar sesión?") },
         confirmButton = {
-            TextButton(onClick = onConfirm) {
+            TextButton(
+                onClick = onConfirm,
+                modifier = Modifier.testTag("logout_confirm")
+            ) {
                 Text("Cerrar sesión")
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(
+                onClick = onDismiss,
+                modifier = Modifier.testTag("logout_cancel")
+            ) {
                 Text("Cancelar")
             }
         }
     )
 }
-

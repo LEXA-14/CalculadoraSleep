@@ -445,7 +445,8 @@ private fun EditSleepOptionCard(option: SleepTimeOption, selected: Boolean, onCl
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick)
+            .testTag("option_card_${option.ciclos}"),
         shape = RoundedCornerShape(16.dp),
         color = when {
             selected -> if (option.esIdeal) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)

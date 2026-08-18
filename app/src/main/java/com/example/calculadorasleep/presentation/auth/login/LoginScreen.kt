@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -139,7 +140,9 @@ fun LoginBody(
                         value = state.email,
                         onValueChange = { onEvent(LoginUiEvent.EmailChanged(it)) },
                         label = { Text("Correo Electrónico") },
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("login_email"),
                         shape = RoundedCornerShape(12.dp),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                         singleLine = true
@@ -151,7 +154,9 @@ fun LoginBody(
                         value = state.password,
                         onValueChange = { onEvent(LoginUiEvent.PasswordChanged(it)) },
                         label = { Text("Contraseña") },
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .testTag("login_password"),
                         shape = RoundedCornerShape(12.dp),
                         visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -168,9 +173,11 @@ fun LoginBody(
                             text = "¿Olvidaste tu contraseña?",
                             color = MaterialTheme.colorScheme.primary,
                             style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.clickable {
-                                onForgotPasswordClick(state.email)
-                            }
+                            modifier = Modifier
+                                .clickable {
+                                    onForgotPasswordClick(state.email)
+                                }
+                                .testTag("forgot_password_btn")
                         )
                     }
 
@@ -180,7 +187,8 @@ fun LoginBody(
                         onClick = { onEvent(LoginUiEvent.LoginSubmit) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(50.dp),
+                            .height(50.dp)
+                            .testTag("login_button"),
                         shape = RoundedCornerShape(25.dp),
                         enabled = !state.isLoading
                     ) {
