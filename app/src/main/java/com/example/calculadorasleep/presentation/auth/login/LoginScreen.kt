@@ -14,21 +14,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.credentials.CredentialManager
-import androidx.credentials.CustomCredential
-import androidx.credentials.GetCredentialRequest
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.calculadorasleep.R
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
@@ -38,8 +30,6 @@ fun LoginScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-    val webClientId = stringResource(id = R.string.web_client_id)
 
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) {
@@ -55,38 +45,13 @@ fun LoginScreen(
         }
     }
 
-    fun launchGoogleSignIn() {
-        coroutineScope.launch {
-            try {
-                val credentialManager = CredentialManager.create(context)
-                val googleIdOption = GetGoogleIdOption.Builder()
-                    .setFilterByAuthorizedAccounts(false)
-                    .setServerClientId(webClientId)
-                    .setAutoSelectEnabled(false)
-                    .build()
-
-                val request = GetCredentialRequest.Builder()
-                    .addCredentialOption(googleIdOption)
-                    .build()
-
-                val result = credentialManager.getCredential(context, request)
-                val credential = result.credential
-
-                if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-                    val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-                    viewModel.onEvent(LoginUiEvent.GoogleSignInSubmit(googleIdTokenCredential.idToken))
-                }
-            } catch (e: Exception) {
-                Toast.makeText(context, "Error con Google: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
     LoginBody(
         state = state,
         onEvent = viewModel::onEvent,
         onNavigateToRegister = onNavigateToRegister,
-        onGoogleSignInClick = { launchGoogleSignIn() },
+        onGoogleSignInClick = {
+            viewModel.onEvent(LoginUiEvent.GoogleSignInSubmit(context))
+        },
         onForgotPasswordClick = { email ->
             if (email.isNotBlank()) {
                 viewModel.onEvent(LoginUiEvent.ForgotPassword(email))

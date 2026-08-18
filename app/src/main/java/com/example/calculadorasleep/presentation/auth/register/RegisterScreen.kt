@@ -38,8 +38,6 @@ fun RegisterScreen (
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-    val webClientId = stringResource(id = R.string.web_client_id)
 
     LaunchedEffect(state.isSuccess) {
         if (state.isSuccess) onRegisterSuccess()
@@ -52,38 +50,13 @@ fun RegisterScreen (
         }
     }
 
-    fun launchGoogleSignIn() {
-        coroutineScope.launch {
-            try {
-                val credentialManager = CredentialManager.create(context)
-                val googleIdOption = GetGoogleIdOption.Builder()
-                    .setFilterByAuthorizedAccounts(false)
-                    .setServerClientId(webClientId)
-                    .setAutoSelectEnabled(false)
-                    .build()
-
-                val request = GetCredentialRequest.Builder()
-                    .addCredentialOption(googleIdOption)
-                    .build()
-
-                val result = credentialManager.getCredential(context, request)
-                val credential = result.credential
-
-                if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-                    val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-                    viewModel.onEvent(RegisterUiEvent.GoogleSignInSubmit(googleIdTokenCredential.idToken))
-                }
-            } catch (e: Exception) {
-                Toast.makeText(context, "Error con Google: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
     RegisterBody(
         state = state,
         onEvent = viewModel::onEvent,
         onNavigateToLogin = onNavigateToLogin,
-        onGoogleSignInClick = { launchGoogleSignIn() }
+        onGoogleSignInClick = {
+            viewModel.onEvent(RegisterUiEvent.GoogleSignInSubmit(context))
+        }
     )
 }
 
