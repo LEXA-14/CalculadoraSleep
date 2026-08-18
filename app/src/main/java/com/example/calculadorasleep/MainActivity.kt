@@ -20,17 +20,14 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val openAlarmsDirectly = intent?.action == "ACTION_OPEN_ALARMS"
         setContent {
             val themeViewModel: ThemeViewModel= hiltViewModel()
             val isDarkMode by themeViewModel.isDarkMode.collectAsStateWithLifecycle()
             CalculadoraSleepTheme (darkTheme = isDarkMode){
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    SleepNavDisplay(openDirectlyToAlarms = openAlarmsDirectly)
+                    SleepNavDisplay()
                 }
             }
         }
     }
 }
-
-
