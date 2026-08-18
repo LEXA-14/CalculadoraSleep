@@ -11,8 +11,9 @@ fun AlarmEntity.toDomain(): Alarm = Alarm(
         label = label
     )
 
-fun Alarm.toEntity(): AlarmEntity = AlarmEntity(
+fun Alarm.toEntity(uid: String): AlarmEntity = AlarmEntity(
         alarmId = alarmId,
+        userId = uid,
         hour = time.hour,
         minute = time.minute,
         isEnabled = isEnabled,
