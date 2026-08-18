@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -134,7 +135,9 @@ fun RegisterBody(
                     value = state.fullName,
                     onValueChange = { onEvent(RegisterUiEvent.FullNameChanged(it)) },
                     label = { Text("Nombre Completo") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("register_name"),
                     shape = RoundedCornerShape(12.dp),
                     singleLine = true
                 )
@@ -145,7 +148,9 @@ fun RegisterBody(
                     value = state.email,
                     onValueChange = { onEvent(RegisterUiEvent.EmailChanged(it)) },
                     label = { Text("Correo Electrónico") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("register_email"),
                     shape = RoundedCornerShape(12.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     singleLine = true
@@ -157,7 +162,9 @@ fun RegisterBody(
                     value = state.password,
                     onValueChange = { onEvent(RegisterUiEvent.PasswordChanged(it)) },
                     label = { Text("Contraseña") },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("register_password"),
                     shape = RoundedCornerShape(12.dp),
                     visualTransformation = PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -170,7 +177,8 @@ fun RegisterBody(
                     onClick = { onEvent(RegisterUiEvent.RegisterSubmit) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(50.dp),
+                        .height(50.dp)
+                        .testTag("register_button"),
                     shape = RoundedCornerShape(25.dp),
                     enabled = !state.isLoading
                 ) {

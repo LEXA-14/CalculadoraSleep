@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
@@ -126,7 +127,9 @@ fun SleepQualityBody(
                                 selected = isSelected,
                                 onClick = { onEvent(SleepQualityUiEvent.TagToggled(tag)) },
                                 label = { Text(tag) },
-                                modifier = Modifier.padding(horizontal = 4.dp),
+                                modifier = Modifier
+                                    .padding(horizontal = 4.dp)
+                                    .testTag("tag_$tag"),
                                 shape = RoundedCornerShape(12.dp)
                             )
                         }
@@ -140,7 +143,8 @@ fun SleepQualityBody(
                 onClick = { onEvent(SleepQualityUiEvent.SaveQuality) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .height(56.dp)
+                    .testTag("save_quality_btn"),
                 shape = RoundedCornerShape(28.dp),
                 enabled = state.rating != null && !state.isLoading
             ) {
@@ -194,6 +198,7 @@ fun RatingBar(
                 modifier = Modifier
                     .size(40.dp)
                     .clickable { onRatingChanged(starIndex) }
+                    .testTag("star_$starIndex")
             )
         }
     }
