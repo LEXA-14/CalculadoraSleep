@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class SleepEntity (
     @PrimaryKey(autoGenerate = true)
     val sleepId:Int=0,
+    val userId: String,
     val dormirTiempo: Long,
     val despertarTiempo: Long,
     val ciclos: Int,

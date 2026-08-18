@@ -12,7 +12,7 @@ import com.example.calculadorasleep.data.sleep.local.sleep.SleepEntity
     SleepEntity::class,
     AlarmEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false)
 abstract class SleepDatabase : RoomDatabase() {
 
