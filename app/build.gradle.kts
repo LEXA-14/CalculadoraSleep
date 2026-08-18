@@ -1,3 +1,6 @@
+import org.gradle.kotlin.dsl.androidTestImplementation
+import org.gradle.kotlin.dsl.testImplementation
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -43,7 +46,6 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.androidx.activity.compose)
 
-//    implementation(libs.androidx.compose.material.icons.core.android)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.ui)
@@ -59,7 +61,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.firebase.firestore)
     ksp(libs.androidx.room.compiler)
-//    implementation(libs.firebase.firestore.ktx)
+
 
     implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.navigation3.ui)
@@ -74,13 +76,12 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
-//    implementation(libs.androidx.compose.material.icons.core)
+
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.datetime)
-    implementation(libs.navigation.compose)
+
     coreLibraryDesugaring(libs.desugar.jdk.libs)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
@@ -89,14 +90,13 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.test.manifest)
     testImplementation(libs.dagger.hilt.android.testing)
-    androidTestImplementation(libs.dagger.hilt.android.testing)
+
 
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.room.testing)
     implementation(libs.compose.adaptive)
     implementation(libs.compose.adaptive.layout)
     implementation(libs.compose.adaptive.nav)
-    testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -104,7 +104,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.compose.material.icons.extended)
-//    implementation(libs.androidx.compose.material.icons.extended)
     implementation(platform(libs.androidx.compose.bom))
 
 // Retrofit
@@ -124,5 +123,17 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.kotlinx.coroutines.test)
+
+    // Instrumented tests
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+
+
+
 
 }
