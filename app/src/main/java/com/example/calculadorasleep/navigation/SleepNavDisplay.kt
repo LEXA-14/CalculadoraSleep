@@ -5,18 +5,27 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import com.example.calculadorasleep.domain.sleep.repository.AuthRepository
 import com.example.calculadorasleep.presentation.alarm.AlarmScreen
 import com.example.calculadorasleep.presentation.auth.login.LoginScreen
 import com.example.calculadorasleep.presentation.auth.register.RegisterScreen
 import com.example.calculadorasleep.presentation.sleep.edit.CalculateScreen
 import com.example.calculadorasleep.presentation.sleep.list.HistoryScreen
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun SleepNavDisplay() {
-    val backStack = rememberNavBackStack(Screen.Login)
+fun SleepNavDisplay(
+) {
+    val startDestination= if (FirebaseAuth.getInstance().currentUser != null){
+        Screen.AlarmList
+    }else{
+        Screen.Login
+    }
+    val backStack = rememberNavBackStack(startDestination)
     val currentScreen = backStack.lastOrNull()
     val showBottomBar = currentScreen is Screen.Home ||
             currentScreen is Screen.AlarmList ||
