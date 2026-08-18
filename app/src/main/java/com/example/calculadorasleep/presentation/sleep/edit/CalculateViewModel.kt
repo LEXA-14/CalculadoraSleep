@@ -78,7 +78,12 @@ class CalculateViewModel @Inject constructor(
     private fun onSave() {
         val current = _state.value
         if (current.isSaving) return
-        val option = current.selectedOption ?: return
+
+        val option = current.selectedOption
+        if (option==null){
+            _state.update { it.copy(error = "Debe elegir una de las opciones antes de guardar") }
+            return
+        }
         val targetTime = current.targetTime ?: return
 
         val (bedTime, wakeTime) = when (current.mode) {
