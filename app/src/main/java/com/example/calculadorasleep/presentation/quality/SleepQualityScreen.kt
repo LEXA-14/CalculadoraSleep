@@ -142,7 +142,7 @@ fun SleepQualityBody(
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = RoundedCornerShape(28.dp),
-                enabled = state.rating > 0 && !state.isLoading
+                enabled = state.rating != null && !state.isLoading
             ) {
                 if (state.isLoading) {
                     CircularProgressIndicator(
@@ -176,7 +176,7 @@ fun SleepQualityBody(
 
 @Composable
 fun RatingBar(
-    rating: Int,
+    rating: Int?,
     onRatingChanged: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -186,10 +186,11 @@ fun RatingBar(
     ) {
         repeat(5) { index ->
             val starIndex = index + 1
+            val isFilled = rating != null && starIndex <= rating
             Icon(
-                imageVector = if (starIndex <= rating) Icons.Filled.Star else Icons.Filled.StarBorder,
+                imageVector = if (isFilled) Icons.Filled.Star else Icons.Filled.StarBorder,
                 contentDescription = null,
-                tint = if (starIndex <= rating) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                tint = if (isFilled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                 modifier = Modifier
                     .size(40.dp)
                     .clickable { onRatingChanged(starIndex) }

@@ -5,29 +5,24 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import com.example.calculadorasleep.domain.sleep.repository.AuthRepository
 import com.example.calculadorasleep.presentation.alarm.AlarmScreen
 import com.example.calculadorasleep.presentation.auth.login.LoginScreen
 import com.example.calculadorasleep.presentation.auth.register.RegisterScreen
 import com.example.calculadorasleep.presentation.sleep.edit.CalculateScreen
+import com.example.calculadorasleep.presentation.alarm.edit.AlarmEditScreen
 import com.example.calculadorasleep.presentation.sleep.list.HistoryScreen
-import com.google.firebase.auth.FirebaseAuth
+import com.example.calculadorasleep.presentation.quality.SleepQualityScreen
 
 @Composable
-fun SleepNavDisplay(
-) {
-    val startDestination= if (FirebaseAuth.getInstance().currentUser != null){
-        Screen.AlarmList
-    }else{
-        Screen.Login
-    }
-    val backStack = rememberNavBackStack(startDestination)
+fun SleepNavDisplay(isLoggedIn: Boolean = false) {
+    val startScreen = if (isLoggedIn) Screen.Home else Screen.Login
+    val backStack = rememberNavBackStack(startScreen)
     val currentScreen = backStack.lastOrNull()
     val showBottomBar = currentScreen is Screen.Home ||
+            currentScreen is Screen.AlarmEdit ||
             currentScreen is Screen.AlarmList ||
             currentScreen is Screen.History
 
@@ -59,7 +54,7 @@ fun SleepNavDisplay(
                         },
                         onLoginSuccess = {
                             backStack.clear()
-                            backStack.add(Screen.Home(0))
+                            backStack.add(Screen.Home)
                         }
                     )
                 }
@@ -81,10 +76,10 @@ fun SleepNavDisplay(
                 entry<Screen.AlarmList> {
                     AlarmScreen(
                         onAddAlarm = {
-                            backStack.add(Screen.Home(0))
+                            backStack.add(Screen.Home)
                         },
                         onEditAlarm = { alarmId ->
-                            backStack.add(Screen.Home(alarmId))
+                            backStack.add(Screen.AlarmEdit(alarmId))
                         },
                         onLogout = {
                             backStack.clear()
@@ -93,13 +88,8 @@ fun SleepNavDisplay(
                     )
                 }
 
-                entry<Screen.Home> { key ->
+                entry<Screen.Home> {
                     CalculateScreen(
-                        alarmId = key.alarmId,
-                        onLogout = {
-                            backStack.clear()
-                            backStack.add(Screen.Login)
-                        },
                         onBack = {
                             if (backStack.size > 1) {
                                 backStack.removeAt(backStack.size - 1)
@@ -107,6 +97,28 @@ fun SleepNavDisplay(
                                 backStack.clear()
                                 backStack.add(Screen.AlarmList)
                             }
+                        },
+                        onLogout = {
+                            backStack.clear()
+                            backStack.add(Screen.Login)
+                        }
+                    )
+                }
+
+                entry<Screen.AlarmEdit> { key ->
+                    AlarmEditScreen(
+                        alarmId = key.alarmId,
+                        onBack = {
+                            if (backStack.size > 1) {
+                                backStack.removeAt(backStack.size - 1)
+                            } else {
+                                backStack.clear()
+                                backStack.add(Screen.AlarmList)
+                            }
+                        },
+                        onLogout = {
+                            backStack.clear()
+                            backStack.add(Screen.Login)
                         }
                     )
                 }
@@ -116,6 +128,16 @@ fun SleepNavDisplay(
                         onLogout = {
                             backStack.clear()
                             backStack.add(Screen.Login)
+                        }
+                    )
+                }
+
+                entry<Screen.SleepQuality> {
+                    SleepQualityScreen(
+                        onNavigateBack = {
+                            if (backStack.isNotEmpty()) {
+                                backStack.removeAt(backStack.size - 1)
+                            }
                         }
                     )
                 }

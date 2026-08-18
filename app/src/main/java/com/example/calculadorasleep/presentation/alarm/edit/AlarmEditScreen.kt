@@ -1,4 +1,4 @@
-package com.example.calculadorasleep.presentation.sleep.edit
+ package com.example.calculadorasleep.presentation.alarm.edit
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Bedtime
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,6 +37,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -56,30 +58,35 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.calculadorasleep.domain.sleep.UseCases.SleepCalculationMode
 import com.example.calculadorasleep.domain.sleep.UseCases.SleepTimeOption
+import com.example.calculadorasleep.presentation.alarm.edit.AlarmEditEvent
 import com.example.calculadorasleep.presentation.auth.Logout.LogoutDialog
 import com.example.calculadorasleep.presentation.auth.Logout.LogoutViewModel
 import com.example.calculadorasleep.ui.theme.CalculadoraSleepTheme
 import kotlinx.coroutines.launch
-import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
-fun CalculateScreen(
+fun AlarmEditScreen(
+    alarmId: Int,
     onBack: () -> Unit,
     onLogout: () -> Unit,
-    viewModel: CalculateViewModel = hiltViewModel()
+    viewModel: AlarmEditViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
-    LaunchedEffect(state.saved) {
-        if (state.saved) {
+    LaunchedEffect(alarmId) {
+        viewModel.onEvent(AlarmEditEvent.Load(alarmId))
+    }
+
+    LaunchedEffect(state.saved, state.deleted) {
+        if (state.saved || state.deleted) {
             onBack()
-            viewModel.onEvent(CalculateEvent.ClearMessage)
+            viewModel.onEvent(AlarmEditEvent.ClearMessage)
         }
     }
 
-    CalculateBody(
+    AlarmEditBody(
         state = state,
         onEvent = viewModel::onEvent,
         onLogout = onLogout
@@ -88,17 +95,18 @@ fun CalculateScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CalculateBody(
-    state: CalculateState,
-    onEvent: (CalculateEvent) -> Unit,
+fun AlarmEditBody(
+    state: AlarmEditState,
+    onEvent: (AlarmEditEvent) -> Unit,
     onLogout: () -> Unit
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(state.message, state.error) {
         (state.message ?: state.error)?.let {
             snackbarHostState.showSnackbar(it)
-            onEvent(CalculateEvent.ClearMessage)
+            onEvent(AlarmEditEvent.ClearMessage)
         }
     }
 
@@ -107,14 +115,14 @@ fun CalculateBody(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Deep Sleep",
+                        text = "Editar Alarma",
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
                     )
                 },
                 actions = {
-                    CalculateTopBarActions(onLogout = onLogout)
+                    EditTopBarActions(onLogout = onLogout)
                 }
             )
         },
@@ -129,7 +137,7 @@ fun CalculateBody(
                 .padding(horizontal = 20.dp)
         ) {
             Spacer(Modifier.height(2.dp))
-            ModeSelector(mode = state.mode, onEvent = onEvent)
+            EditModeSelector(mode = state.mode, onEvent = onEvent)
 
             Spacer(Modifier.height(12.dp))
             Text(
@@ -140,11 +148,11 @@ fun CalculateBody(
             )
 
             Spacer(Modifier.height(6.dp))
-            TimePickerCard(state = state, onEvent = onEvent)
+            EditTimePickerCard(state = state, onEvent = onEvent)
 
             Spacer(Modifier.height(16.dp))
             Button(
-                onClick = { onEvent(CalculateEvent.Calculate) },
+                onClick = { onEvent(AlarmEditEvent.Calculate) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp)
@@ -169,33 +177,66 @@ fun CalculateBody(
                 Spacer(Modifier.height(12.dp))
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     state.options.forEach { option ->
-                        SleepOptionCard(
+                        EditSleepOptionCard(
                             option = option,
                             selected = option == state.selectedOption,
-                            onClick = { onEvent(CalculateEvent.SelectOption(option)) }
+                            onClick = { onEvent(AlarmEditEvent.SelectOption(option)) }
                         )
                     }
                 }
 
                 Spacer(Modifier.height(16.dp))
                 Button(
-                    onClick = { onEvent(CalculateEvent.Save) },
+                    onClick = { onEvent(AlarmEditEvent.Save) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
                 ) {
-                    Text("GUARDAR", fontWeight = FontWeight.Bold)
+                    Text("ACTUALIZAR", fontWeight = FontWeight.Bold)
+                }
+
+                Spacer(Modifier.height(10.dp))
+                EditOutlinedButtonCustom(
+                    onClick = { showDeleteDialog = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp)
+                ) {
+                    Text("ELIMINAR", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.error)
                 }
             }
             Spacer(Modifier.height(20.dp))
         }
     }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Eliminar alarma") },
+            text = { Text("¿Estás seguro de que deseas eliminar esta alarma?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        onEvent(AlarmEditEvent.Delete)
+                    }
+                ) {
+                    Text("Sí, eliminar", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
 }
 
 @Composable
-private fun CalculateTopBarActions(
+private fun EditTopBarActions(
     onLogout: () -> Unit,
     logoutViewModel: LogoutViewModel = hiltViewModel()
 ) {
@@ -225,34 +266,53 @@ private fun CalculateTopBarActions(
 }
 
 @Composable
-private fun ModeSelector(mode: SleepCalculationMode, onEvent: (CalculateEvent) -> Unit) {
+private fun EditOutlinedButtonCustom(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier,
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.error)
+    ) {
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+            content()
+        }
+    }
+}
+
+@Composable
+private fun EditModeSelector(mode: SleepCalculationMode, onEvent: (AlarmEditEvent) -> Unit) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier.height(IntrinsicSize.Max)
     ) {
-        ModeChip(
+        EditModeChip(
             label = "Quiero despertarme a...",
             icon = Icons.Default.WbSunny,
             selected = mode == SleepCalculationMode.WAKE_UP_AT,
             modifier = Modifier
                 .weight(1f)
                 .testTag("chip_wake_up"),
-            onClick = { onEvent(CalculateEvent.ModeChanged(SleepCalculationMode.WAKE_UP_AT)) }
+            onClick = { onEvent(AlarmEditEvent.ModeChanged(SleepCalculationMode.WAKE_UP_AT)) }
         )
-        ModeChip(
+        EditModeChip(
             label = "Me voy a dormir a...",
             icon = Icons.Default.Bedtime,
             selected = mode == SleepCalculationMode.SLEEP_AT,
             modifier = Modifier
                 .weight(1f)
                 .testTag("chip_sleep_at"),
-            onClick = { onEvent(CalculateEvent.ModeChanged(SleepCalculationMode.SLEEP_AT)) }
+            onClick = { onEvent(AlarmEditEvent.ModeChanged(SleepCalculationMode.SLEEP_AT)) }
         )
     }
 }
 
 @Composable
-private fun ModeChip(
+private fun EditModeChip(
     label: String,
     icon: ImageVector,
     selected: Boolean,
@@ -284,7 +344,7 @@ private fun ModeChip(
 }
 
 @Composable
-private fun TimePickerCard(state: CalculateState, onEvent: (CalculateEvent) -> Unit) {
+private fun EditTimePickerCard(state: AlarmEditState, onEvent: (AlarmEditEvent) -> Unit) {
     Surface(
         shape = RoundedCornerShape(20.dp),
         color = MaterialTheme.colorScheme.surfaceVariant,
@@ -297,11 +357,10 @@ private fun TimePickerCard(state: CalculateState, onEvent: (CalculateEvent) -> U
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                NumberStepper(
+                EditNumberStepper(
                     value = state.hour,
                     range = 1..12,
-                    testTag = "stepper_hour",
-                    onChange = { onEvent(CalculateEvent.HourChanged(it)) }
+                    onChange = { onEvent(AlarmEditEvent.HourChanged(it)) }
                 )
                 Text(
                     ":",
@@ -309,28 +368,26 @@ private fun TimePickerCard(state: CalculateState, onEvent: (CalculateEvent) -> U
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                NumberStepper(
+                EditNumberStepper(
                     value = state.minute,
                     range = 0..59,
-                    testTag = "stepper_minute",
-                    onChange = { onEvent(CalculateEvent.MinuteChanged(it)) }
+                    onChange = { onEvent(AlarmEditEvent.MinuteChanged(it)) }
                 )
             }
 
             Spacer(Modifier.height(12.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                PeriodButton("AM", state.isAm, "btn_am") { onEvent(CalculateEvent.PeriodChanged(true)) }
-                PeriodButton("PM", !state.isAm, "btn_pm") { onEvent(CalculateEvent.PeriodChanged(false)) }
+                EditPeriodButton("AM", state.isAm) { onEvent(AlarmEditEvent.PeriodChanged(true)) }
+                EditPeriodButton("PM", !state.isAm) { onEvent(AlarmEditEvent.PeriodChanged(false)) }
             }
         }
     }
 }
 
 @Composable
-private fun NumberStepper(
+private fun EditNumberStepper(
     value: Int,
     range: IntRange,
-    testTag: String,
     onChange: (Int) -> Unit
 ) {
     fun step(delta: Int) {
@@ -341,11 +398,9 @@ private fun NumberStepper(
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .width(64.dp)
-            .testTag(testTag)
+        modifier = Modifier.width(64.dp)
     ) {
-        IconButton(onClick = { step(1) }, modifier = Modifier.testTag("${testTag}_up")) {
+        IconButton(onClick = { step(1) }) {
             Icon(Icons.Default.KeyboardArrowUp, contentDescription = "Aumentar")
         }
         Text(
@@ -354,23 +409,20 @@ private fun NumberStepper(
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        IconButton(onClick = { step(-1) }, modifier = Modifier.testTag("${testTag}_down")) {
+        IconButton(onClick = { step(-1) }) {
             Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Disminuir")
         }
     }
 }
 
 @Composable
-private fun PeriodButton(
+private fun EditPeriodButton(
     label: String,
     selected: Boolean,
-    testTag: String,
     onClick: () -> Unit
 ) {
     Surface(
-        modifier = Modifier
-            .clickable(onClick = onClick)
-            .testTag(testTag),
+        modifier = Modifier.clickable(onClick = onClick),
         shape = RoundedCornerShape(12.dp),
         color = if (selected) MaterialTheme.colorScheme.primary
         else MaterialTheme.colorScheme.surfaceVariant,
@@ -387,14 +439,13 @@ private fun PeriodButton(
 }
 
 @Composable
-private fun SleepOptionCard(option: SleepTimeOption, selected: Boolean, onClick: () -> Unit) {
+private fun EditSleepOptionCard(option: SleepTimeOption, selected: Boolean, onClick: () -> Unit) {
     val formatter = remember { DateTimeFormatter.ofPattern("hh:mm a", Locale.getDefault()) }
 
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .testTag("option_card_${option.ciclos}"),
+            .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
         color = when {
             selected -> if (option.esIdeal) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
@@ -424,7 +475,7 @@ private fun SleepOptionCard(option: SleepTimeOption, selected: Boolean, onClick:
                 }
             }
             Column {
-                Text("Dormir a las", style = MaterialTheme.typography.bodySmall)
+                Text(if (option.time.hour < 12) "Dormir a las" else "Dormir a las", style = MaterialTheme.typography.bodySmall)
                 Text(
                     text = option.time.format(formatter),
                     style = MaterialTheme.typography.headlineSmall,
@@ -434,7 +485,7 @@ private fun SleepOptionCard(option: SleepTimeOption, selected: Boolean, onClick:
                 Spacer(Modifier.height(2.dp))
                 Text("• ${option.ciclos} ciclos de sueño", style = MaterialTheme.typography.bodySmall)
                 Text(
-                    text = "${formatHoras(option.duracionHoras)} de descanso" +
+                    text = "${editFormatHoras(option.duracionHoras)} de descanso" +
                             if (option.ciclos == 4) " (Mínimo)" else " total",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -444,27 +495,30 @@ private fun SleepOptionCard(option: SleepTimeOption, selected: Boolean, onClick:
     }
 }
 
-private fun formatHoras(horas: Double): String {
+private fun editFormatHoras(horas: Double): String {
     val h = horas.toInt()
     val m = ((horas - h) * 60).toInt()
     return if (m == 0) "$h horas" else "$h horas y $m minutos"
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun CalculateBodyPreview() {
-    CalculadoraSleepTheme {
-        CalculateBody(
-            state = CalculateState(
-                targetTime = LocalTime.of(7, 30),
-                options = listOf(
-                    SleepTimeOption(LocalTime.of(22, 30), 6, 9.0, false),
-                    SleepTimeOption(LocalTime.of(0, 0), 5, 7.5, true),
-                    SleepTimeOption(LocalTime.of(1, 30), 4, 6.0, false)
-                )
-            ),
-            onEvent = {},
-            onLogout = {}
-        )
-    }
-}
+ @Preview(showBackground = true)
+ @Composable
+ private fun AlarmEditBodyPreview() {
+     CalculadoraSleepTheme {
+         AlarmEditBody(
+             state = AlarmEditState(
+                 alarmId = 1,
+                 hour = 7,
+                 minute = 30,
+                 isAm = false,
+                 targetTime = java.time.LocalTime.of(7, 30),
+                 options = listOf(
+                     SleepTimeOption(java.time.LocalTime.of(22, 30), 6, 9.0, false),
+                     SleepTimeOption(java.time.LocalTime.of(0, 0), 5, 7.5, true)
+                 )
+             ),
+             onEvent = {},
+             onLogout = {}
+         )
+     }
+ }

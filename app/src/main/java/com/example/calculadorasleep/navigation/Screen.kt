@@ -16,7 +16,10 @@ sealed class Screen : NavKey {
     data object AlarmList : Screen()
 
     @Serializable
-    data class Home(val alarmId: Int = 0) : Screen()
+    data object Home : Screen()
+
+    @Serializable
+    data class AlarmEdit(val alarmId: Int) : Screen()
 
     @Serializable
     data object History : Screen()

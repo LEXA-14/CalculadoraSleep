@@ -23,7 +23,10 @@ class SleepQualityViewModel @Inject constructor(
     fun onEvent(event: SleepQualityUiEvent) {
         when (event) {
             is SleepQualityUiEvent.RatingChanged -> {
-                _state.update { it.copy(rating = event.rating, error = null) }
+                _state.update {
+                    val newRating = if (it.rating == event.rating) null else event.rating
+                    it.copy(rating = newRating, error = null)
+                }
             }
             is SleepQualityUiEvent.TagToggled -> {
                 _state.update { state ->
@@ -43,14 +46,14 @@ class SleepQualityViewModel @Inject constructor(
     }
 
     private fun saveQuality() {
-        if (_state.value.rating == 0) return
+        val rating = _state.value.rating ?: return
 
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
             val latestSleep = observeSleepHistoryUseCase().first().firstOrNull()
 
             if (latestSleep != null) {
-                val updatedSleep = latestSleep.copy(calidadSleep = _state.value.rating)
+                val updatedSleep = latestSleep.copy(calidadSleep = rating)
                 upsertSleepQualityUseCase(updatedSleep)
                     .onSuccess {
                         _state.update { it.copy(isLoading = false, isSaved = true) }
