@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.NightsStay
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -105,6 +106,13 @@ fun HistoryBody(
 
             Spacer(Modifier.height(12.dp))
 
+            FilterChipsRow(
+                filtroSeleccionado = state.filtroFecha,
+                onFiltroSelected = { nuevoFiltro ->
+                    onEvent(HistoryUiEvent.FiltrarPorDias(nuevoFiltro))
+                }
+            )
+
             when {
                 state.isLoading -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -136,6 +144,29 @@ fun HistoryBody(
                     }
                 }
             }
+        }
+    }
+}
+@Composable
+private fun FilterChipsRow(
+    filtroSeleccionado: FechaFiltro,
+    onFiltroSelected: (FechaFiltro) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        FechaFiltro.entries.forEach { filtro ->
+            val label = when (filtro) {
+                FechaFiltro.SIETE_DIAS -> "7 días"
+                FechaFiltro.QUINCE_DIAS -> "15 días"
+                FechaFiltro.TREINTA_DIAS -> "30 días"
+            }
+            FilterChip(
+                selected = filtroSeleccionado == filtro,
+                onClick = { onFiltroSelected(filtro) },
+                label = { Text(label) }
+            )
         }
     }
 }
@@ -245,8 +276,23 @@ private fun HistoryBodyPreview() {
         HistoryBody(
             state = HistoryUiState(
                 registros = listOf(
-                    Sleep(sleepId = 1, dormirTiempo = System.currentTimeMillis() - 28_800_000, despertarTiempo = System.currentTimeMillis(), ciclos = 5, calidadSleep = 4)
-                ),
+                    Sleep(sleepId = 1, dormirTiempo = System.currentTimeMillis() - 28_800_000, despertarTiempo = System.currentTimeMillis(), ciclos = 5, calidadSleep = 4),
+                    Sleep(
+                        sleepId = 3,
+                        dormirTiempo = System.currentTimeMillis() - 2_160_000_000L - 21_600_000L,
+                        despertarTiempo = System.currentTimeMillis() - 2_160_000_000L,
+                        ciclos = 3,
+                        calidadSleep = 3
+                    ),
+                    Sleep(
+                        sleepId = 2,
+                        dormirTiempo = System.currentTimeMillis() - 1_036_800_000L - 25_200_000L,
+                        despertarTiempo = System.currentTimeMillis() - 1_036_800_000L,
+                        ciclos = 4,
+                        calidadSleep = 4
+                    )
+
+            ),
                 stats = SleepStats(noches = 5, duracionPromedioMin = 420, ciclosPromedio = 4.6, calidadPromedio = 3.8)
             ),
             onEvent = {},

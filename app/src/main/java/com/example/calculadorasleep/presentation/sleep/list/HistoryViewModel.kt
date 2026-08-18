@@ -3,6 +3,7 @@ package com.example.calculadorasleep.presentation.sleep.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.calculadorasleep.domain.sleep.UseCases.DeleteSleepUseCase
+import com.example.calculadorasleep.domain.sleep.UseCases.GetSleepSinceUseCase
 import com.example.calculadorasleep.domain.sleep.UseCases.GetSleepStatsUseCase
 import com.example.calculadorasleep.domain.sleep.UseCases.ObserveSleepHistoryUseCase
 import com.example.calculadorasleep.domain.sleep.model.Sleep
@@ -17,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
-    private val observeSleepHistoryUseCase: ObserveSleepHistoryUseCase,
+    private val getSleepSinceUseCase: GetSleepSinceUseCase,
     private val getSleepStatsUseCase: GetSleepStatsUseCase,
     private val deleteSleepUseCase: DeleteSleepUseCase
 ) : ViewModel() {
@@ -25,35 +26,37 @@ class HistoryViewModel @Inject constructor(
     private val _state = MutableStateFlow(HistoryUiState(isLoading = true))
     val state: StateFlow<HistoryUiState> = _state.asStateFlow()
 
+
     init {
-        loadHistory()
-        loadStats()
+        loadHistory(_state.value.filtroFecha)
+        loadStats(_state.value.filtroFecha)
     }
 
     fun onEvent(event: HistoryUiEvent) {
         when (event) {
-            HistoryUiEvent.Load -> loadHistory()
+            HistoryUiEvent.Load -> loadHistory(_state.value.filtroFecha)
             HistoryUiEvent.Refresh -> {
-                loadHistory()
-                loadStats()
+                loadHistory(_state.value.filtroFecha)
+                loadStats(_state.value.filtroFecha)
             }
             is HistoryUiEvent.Delete -> onDelete(event.sleep)
             HistoryUiEvent.ClearMessage -> _state.update { it.copy(message = null, error = null) }
+            is HistoryUiEvent.FiltrarPorDias -> _state.update { it.copy(filtroFecha = event.filtro) }
         }
     }
 
-    private fun loadHistory() {
+    private fun loadHistory(fecha: FechaFiltro) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            observeSleepHistoryUseCase().collectLatest { registros ->
+            getSleepSinceUseCase(fecha.days).collectLatest { registros ->
                 _state.update { it.copy(isLoading = false, registros = registros) }
             }
         }
     }
 
-    private fun loadStats() {
+    private fun loadStats(fecha: FechaFiltro) {
         viewModelScope.launch {
-            getSleepStatsUseCase(dias = 7).collectLatest { stats ->
+            getSleepStatsUseCase(fecha.days).collectLatest { stats ->
                 _state.update { it.copy(stats = stats) }
             }
         }
