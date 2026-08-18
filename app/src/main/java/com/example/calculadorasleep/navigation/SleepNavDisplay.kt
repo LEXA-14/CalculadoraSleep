@@ -68,7 +68,7 @@ fun SleepNavDisplay(isLoggedIn: Boolean = false) {
                         },
                         onRegisterSuccess = {
                             backStack.clear()
-                            backStack.add(Screen.AlarmList)
+                            backStack.add(Screen.Home)
                         }
                     )
                 }
