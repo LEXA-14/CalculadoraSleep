@@ -1,10 +1,10 @@
 package com.example.calculadorasleep.presentation.alarm.edit
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.calculadorasleep.MainDispatcherRule
 import com.example.calculadorasleep.domain.sleep.UseCases.CalculateSleepTimesUseCase
 import com.example.calculadorasleep.domain.sleep.UseCases.ResolveSleepSessionMillisUseCase
 import com.example.calculadorasleep.domain.sleep.UseCases.SaveSleepUseCase
-import com.example.calculadorasleep.domain.sleep.UseCases.SleepTimeOption
 import com.example.calculadorasleep.domain.sleep.model.Alarm
 import com.example.calculadorasleep.domain.sleep.repository.AlarmRepository
 import com.example.calculadorasleep.presentation.alarm.AlarmScheduler
@@ -13,8 +13,8 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.LocalTime
 import org.junit.Assert.*
 import org.junit.Before
@@ -23,8 +23,12 @@ import org.junit.Test
 
 @ExperimentalCoroutinesApi
 class AlarmEditViewModelTest {
+
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
+
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var calculateSleepTimesUseCase: CalculateSleepTimesUseCase
     private lateinit var resolveSleepSessionMillisUseCase: ResolveSleepSessionMillisUseCase
@@ -42,12 +46,20 @@ class AlarmEditViewModelTest {
         alarmRepository = mockk(relaxed = true)
         alarmScheduler = mockk(relaxed = true)
         themeState = mockk(relaxed = true)
-        viewModel = AlarmEditViewModel(calculateSleepTimesUseCase, resolveSleepSessionMillisUseCase, saveSleepUseCase, alarmRepository, alarmScheduler, themeState)
+        
+        viewModel = AlarmEditViewModel(
+            calculateSleepTimesUseCase,
+            resolveSleepSessionMillisUseCase,
+            saveSleepUseCase,
+            alarmRepository,
+            alarmScheduler,
+            themeState
+        )
     }
 
     @Test
-    fun `cargar alarma actualiza el estado con los valores de la alarma`() = runTest {
-        val alarm = Alarm(alarmId = 1, time = LocalTime(14, 30), label = "Test")
+    fun `cargar alarma actualiza el estado con formato 12h`() = runTest {
+        val alarm = Alarm(alarmId = 1, time = LocalTime(14, 30))
         coEvery { alarmRepository.getAlarm(1) } returns alarm
 
         viewModel.onEvent(AlarmEditEvent.Load(1))
