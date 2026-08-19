@@ -24,8 +24,8 @@ class SaveSleepUseCaseTest {
     @Test
     fun `guarda un sleep valido y calcula los ciclos reales`() = runTest {
 
-        val dormir = 0L
-        val despertar = 9 * 60 * 60 * 1000L
+        val dormir =  1_700_000_000_000L
+        val despertar = dormir+9 * 60 * 60 * 1000L
         val sleep = Sleep(dormirTiempo = dormir, despertarTiempo = despertar, ciclos = 0)
 
         val slot = slot<Sleep>()
@@ -50,8 +50,8 @@ class SaveSleepUseCaseTest {
 
     @Test
     fun `no guarda si la calidad es invalida`() = runTest {
-        val dormir = 0L
-        val despertar = 8 * 60 * 60 * 1000L
+        val dormir =  1_700_000_000_000L
+        val despertar = dormir +8 * 60 * 60 * 1000L
         val sleep = Sleep(dormirTiempo = dormir, despertarTiempo = despertar, ciclos = 0, calidadSleep = 9)
 
         val result = useCase(sleep)
@@ -62,8 +62,8 @@ class SaveSleepUseCaseTest {
 
     @Test
     fun `calidad nula no bloquea el guardado`() = runTest {
-        val dormir = 0L
-        val despertar = 8 * 60 * 60 * 1000L
+        val dormir =  1_700_000_000_000L
+        val despertar = dormir +8 * 60 * 60 * 1000L
         val sleep = Sleep(
             dormirTiempo = dormir,
             despertarTiempo = despertar,
