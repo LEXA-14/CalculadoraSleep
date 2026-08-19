@@ -1,6 +1,5 @@
 package com.example.calculadorasleep.presentation.sleep.edit
 
-
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -50,12 +49,11 @@ fun SkyIllustration(
 }
 
 private fun DrawScope.drawSun() {
-    val center = Offset(size.width * 0.78f, size.height * 0.35f)
-    val radius = size.height * 0.22f
+    val center = Offset(size.width * 0.5f, size.height * 0.5f)
+    val radius = size.minDimension * 0.35f
     val rayCount = 8
-    val rayGap = 6.dp.toPx()
-    val rayLength = radius * 0.6f
-
+    val rayGap = (size.minDimension * 0.05f).coerceAtLeast(2f)
+    val rayLength = radius * 0.5f
     repeat(rayCount) { i ->
         val angle = (2 * Math.PI / rayCount) * i
         val start = Offset(
@@ -70,18 +68,16 @@ private fun DrawScope.drawSun() {
             color = SunRays.copy(alpha = 0.7f),
             start = start,
             end = end,
-            strokeWidth = 3.dp.toPx(),
+            strokeWidth = (size.minDimension * 0.04f).coerceAtLeast(1f),
             cap = StrokeCap.Round
         )
     }
-
     drawCircle(color = SunCore, radius = radius, center = center)
 }
 
 private fun DrawScope.drawMoon() {
-    val center = Offset(size.width * 0.78f, size.height * 0.32f)
-    val radius = size.height * 0.22f
-
+    val center = Offset(size.width * 0.5f, size.height * 0.5f)
+    val radius = size.minDimension * 0.35f
     val fullCircle = Path().apply {
         addOval(Rect(center = center, radius = radius))
     }
@@ -101,31 +97,32 @@ private fun DrawScope.drawMoon() {
 
 private fun DrawScope.drawStars() {
     val stars = listOf(
-        Offset(size.width * 0.15f, size.height * 0.25f) to 2f,
-        Offset(size.width * 0.30f, size.height * 0.55f) to 1.5f,
-        Offset(size.width * 0.45f, size.height * 0.20f) to 2.5f,
-        Offset(size.width * 0.10f, size.height * 0.65f) to 1.5f,
-        Offset(size.width * 0.55f, size.height * 0.45f) to 2f
+        Offset(size.width * 0.2f, size.height * 0.2f) to 1.5f,
+        Offset(size.width * 0.8f, size.height * 0.25f) to 1.2f,
+        Offset(size.width * 0.3f, size.height * 0.7f) to 1.0f,
+        Offset(size.width * 0.7f, size.height * 0.8f) to 1.3f,
+        Offset(size.width * 0.1f, size.height * 0.5f) to 0.8f
     )
     stars.forEach { (offset, radiusDp) ->
-        drawCircle(color = StarColor, radius = radiusDp.dp.toPx(), center = offset)
+        drawCircle(color = StarColor, radius = (size.minDimension * 0.02f * radiusDp).coerceAtLeast(1f), center = offset)
     }
 }
 
 private fun DrawScope.drawClouds(color: Color) {
     fun cloud(cx: Float, cy: Float, scale: Float) {
-        drawCircle(color = color, radius = 14.dp.toPx() * scale, center = Offset(cx, cy))
+        val baseRadius = size.minDimension * 0.12f * scale
+        drawCircle(color = color, radius = baseRadius, center = Offset(cx, cy))
         drawCircle(
             color = color,
-            radius = 18.dp.toPx() * scale,
-            center = Offset(cx + 16.dp.toPx() * scale, cy + 4.dp.toPx() * scale)
+            radius = baseRadius * 1.3f,
+            center = Offset(cx + baseRadius * 1.1f, cy + baseRadius * 0.3f)
         )
         drawCircle(
             color = color,
-            radius = 12.dp.toPx() * scale,
-            center = Offset(cx + 32.dp.toPx() * scale, cy)
+            radius = baseRadius * 0.9f,
+            center = Offset(cx + baseRadius * 2.2f, cy)
         )
     }
-    cloud(size.width * 0.10f, size.height * 0.75f, 1f)
-    cloud(size.width * 0.50f, size.height * 0.85f, 0.8f)
+    cloud(size.width * 0.15f, size.height * 0.7f, 1f)
+    cloud(size.width * 0.55f, size.height * 0.8f, 0.7f)
 }
