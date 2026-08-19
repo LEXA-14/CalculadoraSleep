@@ -142,11 +142,15 @@ class AlarmEditViewModel @Inject constructor(
                     label = "Alarma de Ciclo (${option.ciclos} ciclos)"
                 )
                 alarmRepository.upsert(alarmToSave)
-                alarmScheduler.schedule(alarmToSave)
+                val scheduleResult = alarmScheduler.schedule(alarmToSave)
 
-                _state.update { it.copy(isSaving = false, message = "Actualizado") }
-                kotlinx.coroutines.delay(800)
-                _state.update { it.copy(saved = true) }
+                scheduleResult.onSuccess {
+                    _state.update { it.copy(isSaving = false, message = "Actualizado") }
+                    kotlinx.coroutines.delay(800)
+                    _state.update { it.copy(saved = true) }
+                }.onFailure { e ->
+                    _state.update { it.copy(isSaving = false, error = e.message) }
+                }
             }.onFailure { e ->
                 _state.update { it.copy(isSaving = false, error = e.message) }
             }
