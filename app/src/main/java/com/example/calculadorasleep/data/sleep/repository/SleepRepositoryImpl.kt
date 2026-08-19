@@ -10,7 +10,6 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -42,9 +41,14 @@ class SleepRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getSince(since: Long): Flow<List<Sleep>> {
-        val uid = currentUserId ?: return flowOf(emptyList())
-        return localDataSource.getSince(uid,since).map { entities ->
-            entities.map { it.toDomain() }
+        return authStateFlow.flatMapLatest { uid ->
+            if (uid == null) {
+                flowOf(emptyList())
+            } else {
+                localDataSource.getSince(uid, since).map { entities ->
+                    entities.map { it.toDomain() }
+                }
+            }
         }
     }
 
