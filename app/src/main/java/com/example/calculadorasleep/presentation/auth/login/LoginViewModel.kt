@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.calculadorasleep.domain.sleep.UseCases.auth.GoogleSignInUseCase
 import com.example.calculadorasleep.domain.sleep.UseCases.auth.LoginUseCase
+import com.example.calculadorasleep.domain.sleep.UseCases.auth.LogoutUseCase
 import com.example.calculadorasleep.domain.sleep.UseCases.auth.ResetPasswordUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +18,9 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val googleSignInUseCase: GoogleSignInUseCase,
-    private val resetPasswordUseCase: ResetPasswordUseCase
+    private val resetPasswordUseCase: ResetPasswordUseCase,
+    private val logoutUseCase: LogoutUseCase
+
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LoginUiState())
@@ -42,8 +45,13 @@ class LoginViewModel @Inject constructor(
             }
 
             LoginUiEvent.ClearSuccess -> _state.value = LoginUiState()
+            LoginUiEvent.Logout ->viewModelScope.launch {
+                logout()
+            }
+
+            }
         }
-    }
+
 
     private fun loginWithEmail() {
         viewModelScope.launch {
@@ -67,5 +75,8 @@ class LoginViewModel @Inject constructor(
                 _state.update { it.copy(isLoading = false, error = error.message) }
             }
         }
+    }
+     suspend fun logout() {
+         logoutUseCase()
     }
 }
