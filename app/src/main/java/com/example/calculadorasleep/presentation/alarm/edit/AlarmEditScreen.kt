@@ -58,9 +58,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.calculadorasleep.domain.sleep.UseCases.SleepCalculationMode
 import com.example.calculadorasleep.domain.sleep.UseCases.SleepTimeOption
-import com.example.calculadorasleep.presentation.alarm.edit.AlarmEditEvent
 import com.example.calculadorasleep.presentation.auth.Logout.LogoutDialog
-import com.example.calculadorasleep.presentation.auth.Logout.LogoutViewModel
+import com.example.calculadorasleep.presentation.auth.login.LoginViewModel
 import com.example.calculadorasleep.ui.theme.CalculadoraSleepTheme
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
@@ -238,7 +237,7 @@ fun AlarmEditBody(
 @Composable
 private fun EditTopBarActions(
     onLogout: () -> Unit,
-    logoutViewModel: LogoutViewModel = hiltViewModel()
+    logoutViewModel: LoginViewModel = hiltViewModel()
 ) {
     var showLogoutDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()

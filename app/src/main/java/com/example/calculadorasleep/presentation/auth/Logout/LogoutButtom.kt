@@ -16,12 +16,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.calculadorasleep.presentation.auth.login.LoginViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun LogoutButton(
     onLogout: () -> Unit,
-    viewModel: LogoutViewModel = hiltViewModel()
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
     var showDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
