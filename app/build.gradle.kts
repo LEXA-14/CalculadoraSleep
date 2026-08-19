@@ -42,6 +42,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.compose.foundation.layout)
     testImplementation(libs.turbine)
     implementation(platform(libs.firebase.bom))
     implementation(libs.androidx.activity.compose)

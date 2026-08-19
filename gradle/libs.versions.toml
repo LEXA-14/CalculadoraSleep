@@ -64,6 +64,7 @@ androidxTestExtJunit = "1.1.5"
 
 mockitoKotlin = "5.2.1"
 coroutinesTest = "1.8.0"
+foundationLayout = "1.12.0"
 
 
 
@@ -143,6 +144,7 @@ firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-fires
 mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
 mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxTestExtJunit" }
+androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
