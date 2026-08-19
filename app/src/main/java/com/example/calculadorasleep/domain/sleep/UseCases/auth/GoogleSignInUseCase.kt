@@ -8,6 +8,6 @@ class GoogleSignInUseCase @Inject constructor(
     private val repository: AuthRepository
 ) {
     suspend operator fun invoke(context: Context): Result<Boolean> {
-        return repository.signInWithGoogle(context)
+        return runCatching { repository.signInWithGoogle(context) }
     }
 }
