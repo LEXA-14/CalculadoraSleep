@@ -4,8 +4,12 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.calculadorasleep.MainDispatcherRule
 import com.example.calculadorasleep.domain.sleep.UseCases.auth.GoogleSignInUseCase
 import com.example.calculadorasleep.domain.sleep.UseCases.auth.LoginUseCase
+import com.example.calculadorasleep.domain.sleep.UseCases.auth.LogoutUseCase
 import com.example.calculadorasleep.domain.sleep.UseCases.auth.ResetPasswordUseCase
+import io.mockk.Runs
 import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -27,6 +31,7 @@ class LoginViewModelTest {
     private lateinit var loginUseCase: LoginUseCase
     private lateinit var googleSignInUseCase: GoogleSignInUseCase
     private lateinit var resetPasswordUseCase: ResetPasswordUseCase
+    private lateinit var logoutUseCase: LogoutUseCase
     private lateinit var viewModel: LoginViewModel
 
     @Before
@@ -34,7 +39,8 @@ class LoginViewModelTest {
         loginUseCase = mockk(relaxed = true)
         googleSignInUseCase = mockk(relaxed = true)
         resetPasswordUseCase = mockk(relaxed = true)
-        viewModel = LoginViewModel(loginUseCase, googleSignInUseCase, resetPasswordUseCase)
+        logoutUseCase=mockk(relaxed = true)
+        viewModel = LoginViewModel(loginUseCase, googleSignInUseCase, resetPasswordUseCase,logoutUseCase)
     }
 
     @Test
@@ -71,4 +77,15 @@ class LoginViewModelTest {
         assertEquals("", viewModel.state.value.password)
         assertFalse(viewModel.state.value.isSuccess)
     }
+    @Test
+    fun `cuando se hace logout se llama al logoutUseCase`() = runTest {
+        coEvery { logoutUseCase() } just Runs
+
+        viewModel.onEvent(LoginUiEvent.Logout)
+
+        advanceUntilIdle()
+
+        coVerify { logoutUseCase() }
+    }
+
 }

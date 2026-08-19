@@ -15,8 +15,8 @@ interface SleepDao {
 
     @Delete
     suspend fun delete(sleep: SleepEntity)
-    @Query("Delete from sleep where sleepId= :id")
-    suspend fun deleteById(id: Int)
+    @Query("Delete from sleep where sleepId= :id AND userId =:userId")
+    suspend fun deleteById(id: Int, userId: String)
 
     @Query("SELECT * FROM sleep where userId = :userId ORDER BY dormirTiempo DESC")
     fun getAll(userId: String): Flow<List<SleepEntity>>
