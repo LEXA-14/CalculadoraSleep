@@ -125,13 +125,17 @@ fun CalculateBody(
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text("CALCULAR", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimary)
+                Text(
+                    "CALCULAR",
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             }
 
             if (state.options.isNotEmpty()) {
                 Spacer(Modifier.height(28.dp))
                 Text(
-                    text = if(state.mode== SleepCalculationMode.WAKE_UP_AT)
+                    text = if (state.mode == SleepCalculationMode.WAKE_UP_AT)
                         "Mejores horas para dormir" else "Mejores horas para despertar",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
@@ -150,160 +154,30 @@ fun CalculateBody(
                     }
                 }
             }
+            if (state.options.isNotEmpty()) {
+                Spacer(Modifier.height(24.dp))
 
+                Button(
+                    onClick = { onEvent(CalculateEvent.Save) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(54.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
+                    )
+                ) {
+                    Text("GUARDAR", fontWeight = FontWeight.Bold)
+                }
+            }
             Spacer(Modifier.height(24.dp))
         }
     }
 }
 
 
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun CalculateBody(
-//    state: CalculateState,
-//    onEvent: (CalculateEvent) -> Unit,
-//    onLogout: () -> Unit
-//) {
-//    val snackbarHostState = remember { SnackbarHostState() }
-//    LaunchedEffect(state.message, state.error) {
-//        (state.message ?: state.error)?.let {
-//            snackbarHostState.showSnackbar(it)
-//            onEvent(CalculateEvent.ClearMessage)
-//        }
-//    }
-//    Scaffold(
-//        topBar = {
-//            TopAppBar(
-//                title = {
-//                    Text(
-//                        text = "Deep Sleep",
-//                        style = MaterialTheme.typography.headlineSmall,
-//                        fontWeight = FontWeight.Bold,
-//                        color = MaterialTheme.colorScheme.primary
-//                    )
-//                },
-//                actions = {
-//                    Box(Modifier.fillMaxWidth()) {
-//                        SkyIllustration(
-//                            mode = state.mode,
-//                            modifier = Modifier.fillMaxWidth()
-//                                .height(40.dp)
-//                                .align(Alignment.TopCenter)
-//                        )
-//                                    Spacer(Modifier.height(5.dp))
-//                        CalculateTopBarActions(onLogout = onLogout)
-//                    }
-//                },
-//                colors = TopAppBarDefaults.topAppBarColors(
-//                    containerColor = Color.Transparent,
-//                    scrolledContainerColor = Color.Transparent
-//                )
-//            )
-//        },
-//        snackbarHost = { SnackbarHost(snackbarHostState) },
-//        containerColor = MaterialTheme.colorScheme.background,
-//        contentWindowInsets = WindowInsets(0, 0, 0, 0)
-//    ) { padding ->
-//        Column(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .padding(padding)
-//                .verticalScroll(rememberScrollState())
-//                .padding(horizontal = 20.dp)
-//        ) {
-//            Spacer(Modifier.height(12.dp))
-//            ModeSelector(mode = state.mode, onEvent = onEvent)
-//            Spacer(Modifier.height(16.dp))
-//            Text(
-//                text = if (state.mode == SleepCalculationMode.WAKE_UP_AT)
-//                    "Hora de despertar" else "Hora de dormir",
-//                style = MaterialTheme.typography.labelMedium,
-//                color = MaterialTheme.colorScheme.tertiary
-//            )
-//            Spacer(Modifier.height(8.dp))
-//            TimePickerCard(state = state, onEvent = onEvent)
-//            Spacer(Modifier.height(20.dp))
-//            Button(
-//                onClick = { onEvent(CalculateEvent.Calculate) },
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(54.dp)
-//                    .testTag("btn_calculate"),
-//                shape = RoundedCornerShape(16.dp),
-//                colors = ButtonDefaults.buttonColors(
-//                    containerColor = MaterialTheme.colorScheme.primary,
-//                    contentColor = MaterialTheme.colorScheme.onPrimary
-//                )
-//            ) {
-//                Text("CALCULAR", fontWeight = FontWeight.Bold)
-//            }
-//            if (state.options.isNotEmpty()) {
-//                Spacer(Modifier.height(24.dp))
-//                Text(
-//                    text = if (state.mode == SleepCalculationMode.WAKE_UP_AT)
-//                        "Mejores horas para dormir" else "Mejores horas para despertar",
-//                    style = MaterialTheme.typography.titleLarge,
-//                    fontWeight = FontWeight.Bold,
-//                    textAlign = TextAlign.Center,
-//                    modifier = Modifier.fillMaxWidth()
-//                )
-//                Spacer(Modifier.height(16.dp))
-//                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-//                    state.options.forEach { option ->
-//                        SleepOptionCard(
-//                            option = option,
-//                            selected = option == state.selectedOption,
-//                            onClick = { onEvent(CalculateEvent.SelectOption(option)) }
-//                        )
-//                    }
-//                }
-//                Spacer(Modifier.height(24.dp))
-//                Button(
-//                    onClick = { onEvent(CalculateEvent.Save) },
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .height(54.dp),
-//                    shape = RoundedCornerShape(16.dp),
-//                    colors = ButtonDefaults.buttonColors(
-//                        containerColor = MaterialTheme.colorScheme.secondary,
-//                        contentColor = MaterialTheme.colorScheme.onSecondary
-//                    )
-//                ) {
-//                    Text("GUARDAR", fontWeight = FontWeight.Bold)
-//                }
-//            }
-//            Spacer(Modifier.height(24.dp))
-//        }
-//    }
-//}
 
-//@Composable
-//private fun CalculateTopBarActions(
-//    onLogout: () -> Unit,
-//    logoutViewModel: LogoutViewModel = hiltViewModel()
-//) {
-//    var showLogoutDialog by remember { mutableStateOf(false) }
-//    val scope = rememberCoroutineScope()
-//    IconButton(onClick = { showLogoutDialog = true }) {
-//        Icon(
-//            imageVector = Icons.AutoMirrored.Filled.Logout,
-//            contentDescription = "Cerrar sesión",
-//            tint = MaterialTheme.colorScheme.onBackground
-//        )
-//    }
-//    if (showLogoutDialog) {
-//        LogoutDialog(
-//            onDismiss = { showLogoutDialog = false },
-//            onConfirm = {
-//                showLogoutDialog = false
-//                scope.launch {
-//                    logoutViewModel.logout()
-//                    onLogout()
-//                }
-//            }
-//        )
-//    }
-//}
 
 @Composable
 private fun CalculateTopBarActions(
