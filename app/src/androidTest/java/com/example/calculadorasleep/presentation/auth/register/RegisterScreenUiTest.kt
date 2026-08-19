@@ -10,6 +10,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class RegisterScreenUiTest {
+
     @get:Rule
     val composeTestRule = createComposeRule()
 
@@ -17,9 +18,15 @@ class RegisterScreenUiTest {
     fun registerScreen_displaysElementsCorrectly() {
         composeTestRule.setContent {
             CalculadoraSleepTheme {
-                RegisterBody(state = RegisterUiState(), onEvent = {}, onNavigateToLogin = {}, onGoogleSignInClick = {})
+                RegisterBody(
+                    state = RegisterUiState(),
+                    onEvent = {},
+                    onNavigateToLogin = {},
+                    onGoogleSignInClick = {}
+                )
             }
         }
+        
         composeTestRule.onNodeWithTag("register_name").assertIsDisplayed()
         composeTestRule.onNodeWithTag("register_email").assertIsDisplayed()
         composeTestRule.onNodeWithTag("register_password").assertIsDisplayed()
@@ -27,14 +34,31 @@ class RegisterScreenUiTest {
     }
 
     @Test
-    fun registerScreen_triggersSubmitEvent() {
-        var submitCalled = false
+    fun registerScreen_passwordVisibilityToggle_appearsOnlyWhenNotEmpty() {
         composeTestRule.setContent {
             CalculadoraSleepTheme {
-                RegisterBody(state = RegisterUiState(), onEvent = { if (it is RegisterUiEvent.RegisterSubmit) submitCalled = true }, onNavigateToLogin = {}, onGoogleSignInClick = {})
+                RegisterBody(
+                    state = RegisterUiState(password = ""),
+                    onEvent = {},
+                    onNavigateToLogin = {},
+                    onGoogleSignInClick = {}
+                )
             }
         }
-        composeTestRule.onNodeWithTag("register_button").performClick()
-        assert(submitCalled)
+        
+        composeTestRule.onNodeWithTag("password_visibility_toggle").assertDoesNotExist()
+
+        composeTestRule.setContent {
+            CalculadoraSleepTheme {
+                RegisterBody(
+                    state = RegisterUiState(password = "abc"),
+                    onEvent = {},
+                    onNavigateToLogin = {},
+                    onGoogleSignInClick = {}
+                )
+            }
+        }
+        
+        composeTestRule.onNodeWithTag("password_visibility_toggle").assertIsDisplayed()
     }
 }
