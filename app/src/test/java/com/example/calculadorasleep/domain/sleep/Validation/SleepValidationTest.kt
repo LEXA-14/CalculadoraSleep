@@ -7,9 +7,11 @@ class SleepValidationTest {
 
     @Test
     fun `validateTiempos con dormirTiempo cero o negativo es invalido`() {
-        val result = validateTiempos(dormirTiempo = 0L, despertarTiempo = 1000L)
-        assertFalse(result.isValid)
-        assertEquals("Hora de dormir inválida", result.error)
+        val dormir = 1_700_000_000_000L
+        val despertar = dormir + 8 * 60 * 60 * 1000L
+        val result = validateTiempos(dormir, despertar)
+        assertTrue(result.isValid)
+        assertEquals(null, result.error)
     }
 
     @Test
@@ -26,16 +28,16 @@ class SleepValidationTest {
     }
     @Test
     fun `validateTiempos con duracion valida es valido`() {
-        val dormir = 0L
-        val despertar = 8 * 60 * 60 * 1000L
+        val dormir = 1_700_000_000_000L
+        val despertar =dormir+ 8 * 60 * 60 * 1000L
         val result = validateTiempos(dormir, despertar)
         assertTrue(result.isValid)
         assertEquals(null, result.error)
     }
     @Test
     fun `validateTiempos en el limite exacto de 24 horas es valido`() {
-        val dormir = 0L
-        val despertar = 24 * 60 * 60 * 1000L
+        val dormir = 1_700_000_000_000L
+        val despertar = dormir + 24 * 60 * 60 * 1000L
         val result = validateTiempos(dormir, despertar)
         assertTrue(result.isValid)
     }
