@@ -10,6 +10,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class SleepQualityScreenUiTest {
+
     @get:Rule
     val composeTestRule = createComposeRule()
 
@@ -17,12 +18,16 @@ class SleepQualityScreenUiTest {
     fun qualityScreen_displaysElements() {
         composeTestRule.setContent {
             CalculadoraSleepTheme {
-                SleepQualityBody(state = SleepQualityUiState(), onEvent = {})
+                SleepQualityBody(
+                    state = SleepQualityUiState(),
+                    onEvent = {}
+                )
             }
         }
+        
         composeTestRule.onNodeWithText("¿Cómo dormiste anoche?").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("star_1").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("star_5").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("star_rating_1").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("star_rating_5").assertIsDisplayed()
         composeTestRule.onNodeWithTag("save_quality_btn").assertIsDisplayed()
     }
 
@@ -30,10 +35,11 @@ class SleepQualityScreenUiTest {
     fun qualityScreen_selectionLogic_works() {
         var capturedRating: Int? = null
         var capturedTag: String? = null
+        
         composeTestRule.setContent {
             CalculadoraSleepTheme {
                 SleepQualityBody(
-                    state = SleepQualityUiState(rating = 3, selectedTags = listOf("Interrumpido")),
+                    state = SleepQualityUiState(rating = 3, selectedTag = "Interrumpido"),
                     onEvent = { event ->
                         when (event) {
                             is SleepQualityUiEvent.RatingChanged -> capturedRating = event.rating
@@ -44,8 +50,10 @@ class SleepQualityScreenUiTest {
                 )
             }
         }
-        composeTestRule.onNodeWithTag("star_5").performClick()
+        
+        composeTestRule.onNodeWithTag("star_rating_5").performClick()
         assert(capturedRating == 5)
+        
         composeTestRule.onNodeWithTag("tag_Me siento descansado").performClick()
         assert(capturedTag == "Me siento descansado")
     }
@@ -54,9 +62,13 @@ class SleepQualityScreenUiTest {
     fun qualityScreen_saveButtonDisabled_whenNoRating() {
         composeTestRule.setContent {
             CalculadoraSleepTheme {
-                SleepQualityBody(state = SleepQualityUiState(rating = null), onEvent = {})
+                SleepQualityBody(
+                    state = SleepQualityUiState(rating = null),
+                    onEvent = {}
+                )
             }
         }
+        
         composeTestRule.onNodeWithTag("save_quality_btn").assertIsNotEnabled()
     }
 }
