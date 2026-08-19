@@ -10,6 +10,6 @@ class LoginUseCase @Inject constructor(
         if (email.isBlank() || password.isBlank()) {
             return Result.failure(Exception("El correo y contraseña no pueden estar vacíos"))
         }
-        return repository.login(email, password)
+        return runCatching { repository.login(email, password) }
     }
 }
