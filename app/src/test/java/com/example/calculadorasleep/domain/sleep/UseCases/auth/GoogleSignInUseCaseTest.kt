@@ -22,8 +22,16 @@ class GoogleSignInUseCaseTest {
     @Test
     fun `llama al repositorio para iniciar sesion con google`() = runTest {
         val context = mockk<Context>()
-        coEvery { repository.signInWithGoogle(context) } returns Result.success(true)
+        coEvery { repository.signInWithGoogle(context) } returns true
         val result = useCase(context)
         assertTrue(result.isSuccess)
+    }
+
+    @Test
+    fun `cuando el repositorio falla retorna error capturado`() = runTest {
+        val context = mockk<Context>()
+        coEvery { repository.signInWithGoogle(any()) } throws Exception("Google login error")
+        val result = useCase(context)
+        assertTrue(result.isFailure)
     }
 }

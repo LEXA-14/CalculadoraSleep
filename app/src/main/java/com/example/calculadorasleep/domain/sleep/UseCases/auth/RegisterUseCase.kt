@@ -13,6 +13,6 @@ class RegisterUseCase @Inject constructor(
         if (password.length < 6) {
             return Result.failure(Exception("La contraseña debe tener al menos 6 caracteres"))
         }
-        return repository.register(email, password, fullName)
+        return runCatching { repository.register(email, password, fullName) }
     }
 }

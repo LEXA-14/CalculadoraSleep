@@ -38,17 +38,17 @@ class AuthRepositoryImplTest {
         every { auth.signInWithEmailAndPassword(email, pass) } returns task
         coEvery { task.await() } returns mockk()
         val result = repository.login(email, pass)
-        assertTrue(result.isSuccess)
+        assertTrue(result)
     }
 
-    @Test
-    fun `login fallido retorna error`() = runTest {
+    @Test(expected = Exception::class)
+    fun `login fallido lanza excepcion`() = runTest {
         val email = "test@test.com"
         val pass = "123456"
         val task = mockk<Task<AuthResult>>()
         every { auth.signInWithEmailAndPassword(email, pass) } returns task
         coEvery { task.await() } throws Exception("Auth error")
-        val result = repository.login(email, pass)
-        assertTrue(result.isFailure)
+        
+        repository.login(email, pass)
     }
 }

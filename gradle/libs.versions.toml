@@ -1,7 +1,6 @@
 
 [versions]
 agp = "9.2.1"
-coilCompose = "2.7.0"
 coreKtx = "1.18.0"
 coreTesting = "2.2.0"
 credentials = "1.2.0"
@@ -24,10 +23,9 @@ composeBom = "2026.02.01"
 ksp = "2.3.7"
 lifecycleViewmodelKtx = "2.6.2"
 mockk = "1.13.8"
-navigationCompose = "2.9.8"
-robolectric = "4.13"
 roomKtx = "2.8.4"
 roomRuntime = "2.8.4"
+robolectric = "4.13"
 kotlinxDatetime = "0.8.0"
 desugar_jdk_libs = "2.1.5"
 roomTesting = "2.6.0"
@@ -40,34 +38,20 @@ material3 = "1.4.0"
 uiToolingPreview = "1.11.2"
 uiTooling = "1.11.2"
 materialIconsCoreAndroid = "1.7.8"
-retrofit2KotlinxSerializationConverter = "1.0.0"
-retrofit = "3.0.0"
-moshiKotlin = "1.15.2"
-converterMoshi = "3.0.0"
 runtime = "1.11.2"
 transportRuntime = "4.1.1"
 lifecycleViewmodelKtxVersion = "2.11.0"
 runtimeVersion = "1.11.3"
 uiToolingPreviewVersion = "1.11.3"
 uiToolingVersion = "1.11.3"
-
-
 navigation3 = "1.1.3"
 kotlinSerialization = "2.0.21"
 androidxRuntime = "1.11.4"
 navigation3Ui = "1.1.5"
 firebaseBom = "34.17.0"
-firebaseFirestoreKtx = "25.1.4"
-
-mockito = "5.11.0"
 androidxTestExtJunit = "1.1.5"
-
-mockitoKotlin = "5.2.1"
 coroutinesTest = "1.8.0"
 foundationLayout = "1.12.0"
-
-
-
 
 [libraries]
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
@@ -78,16 +62,13 @@ androidx-credentials-play-services-auth = { module = "androidx.credentials:crede
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleViewmodelKtx" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
-androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "roomTesting" }
 androidx-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "uiTestJunit4" }
 androidx-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "uiTestManifest" }
-coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 dagger-hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hiltAndroidTestingVersion" }
-firebase-auth = { module = "com.google.firebase:firebase-auth" }
 googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
@@ -111,38 +92,26 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 desugar_jdk_libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 compose-adaptive = { group = "androidx.compose.material3.adaptive", name = "adaptive", version.ref = "adaptive" }
 compose-adaptive-layout = { group = "androidx.compose.material3.adaptive", name = "adaptive-layout", version.ref = "adaptive" }
 compose-adaptive-nav = { group = "androidx.compose.material3.adaptive", name = "adaptive-navigation", version.ref = "adaptive" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "uiToolingPreview" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
-
-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
-retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "retrofit2KotlinxSerializationConverter" }
-converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "converterMoshi" }
-robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
-squareup-moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshiKotlin" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
 transport-runtime = { group = "com.google.android.datatransport", name = "transport-runtime", version.ref = "transportRuntime" }
-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtxVersion" }
 androidx-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtimeVersion" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "uiToolingPreviewVersion" }
 ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiToolingVersion" }
-
 androidx-navigation3-runtime = { group = "androidx.navigation3", name = "navigation3-runtime", version.ref = "navigation3" }
 androidx-navigation3-ui = { group = "androidx.navigation3", name = "navigation3-ui", version.ref = "navigation3" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.7.3" }
-#noinspection SimilarGradleDependency
 runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "androidxRuntime" }
 navigation3-ui = { group = "androidx.navigation3", name = "navigation3-ui", version.ref = "navigation3Ui" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
-firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
-firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx" }
-mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
-mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxTestExtJunit" }
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
 
@@ -152,4 +121,3 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-

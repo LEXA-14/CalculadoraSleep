@@ -15,7 +15,7 @@ import java.time.ZoneId
 class AlarmScheduler(private val context: Context) {
     private val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-    fun schedule(alarm: Alarm) {
+    fun schedule(alarm: Alarm): Result<Unit> {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (!alarmManager.canScheduleExactAlarms()) {
                 val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
@@ -23,7 +23,7 @@ class AlarmScheduler(private val context: Context) {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 }
                 context.startActivity(intent)
-                return
+                return Result.failure(Exception("Falta permiso para programar alarmas exactas. Se ha abierto la configuración."))
             }
         }
 
@@ -46,14 +46,15 @@ class AlarmScheduler(private val context: Context) {
 
         val triggerMillis = alarmTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
-        try {
+        return try {
             alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP,
                 triggerMillis,
                 pendingIntent
             )
+            Result.success(Unit)
         } catch (e: SecurityException) {
-            e.printStackTrace()
+            Result.failure(e)
         }
     }
 

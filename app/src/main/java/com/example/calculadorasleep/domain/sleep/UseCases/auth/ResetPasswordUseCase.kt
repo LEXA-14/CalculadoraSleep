@@ -7,6 +7,6 @@ class ResetPasswordUseCase @Inject constructor(
     private val repository: AuthRepository
 ) {
     suspend operator fun invoke(email: String): Result<Boolean> {
-        return repository.resetPassword(email)
+        return runCatching { repository.resetPassword(email) }
     }
 }

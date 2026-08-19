@@ -28,9 +28,17 @@ class LoginUseCaseTest {
 
     @Test
     fun `cuando email y password son correctos retorna exito`() = runTest {
-        coEvery { repository.login("test@test.com", "123456") } returns Result.success(true)
+        coEvery { repository.login("test@test.com", "123456") } returns true
         val result = useCase("test@test.com", "123456")
         assertTrue(result.isSuccess)
         assertTrue(result.getOrNull() == true)
+    }
+
+    @Test
+    fun `cuando el repositorio falla retorna error capturado`() = runTest {
+        coEvery { repository.login(any(), any()) } throws Exception("Database error")
+        val result = useCase("test@test.com", "123456")
+        assertTrue(result.isFailure)
+        assertEquals("Database error", result.exceptionOrNull()?.message)
     }
 }
