@@ -41,7 +41,7 @@ class LoginViewModel @Inject constructor(
                 }
             }
 
-            LoginUiEvent.ClearSuccess -> _state.update { it.copy(isSuccess = false) }
+            LoginUiEvent.ClearSuccess -> _state.value = LoginUiState()
         }
     }
 
