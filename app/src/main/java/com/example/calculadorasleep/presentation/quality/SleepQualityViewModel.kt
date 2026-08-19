@@ -20,22 +20,28 @@ class SleepQualityViewModel @Inject constructor(
     private val _state = MutableStateFlow(SleepQualityUiState())
     val state = _state.asStateFlow()
 
+    private val tagToRating = mapOf(
+        "Me siento descansado" to 5,
+        "Me costó despertar" to 2,
+        "Tuve sueños locos" to 3,
+        "Interrumpido" to 1
+    )
+
     fun onEvent(event: SleepQualityUiEvent) {
         when (event) {
             is SleepQualityUiEvent.RatingChanged -> {
-                _state.update {
-                    val newRating = if (it.rating == event.rating) null else event.rating
-                    it.copy(rating = newRating, error = null)
+                _state.update { currentState ->
+                    val newRating = if (currentState.rating == event.rating) null else event.rating
+                    val newTag = tagToRating.entries.find { it.value == newRating }?.key
+                    currentState.copy(rating = newRating, selectedTag = newTag, error = null)
                 }
             }
             is SleepQualityUiEvent.TagToggled -> {
-                _state.update { state ->
-                    val newTags = if (state.selectedTags.contains(event.tag)) {
-                        state.selectedTags - event.tag
-                    } else {
-                        state.selectedTags + event.tag
-                    }
-                    state.copy(selectedTags = newTags)
+                _state.update { currentState ->
+                    val isSameTag = currentState.selectedTag == event.tag
+                    val newTag = if (isSameTag) null else event.tag
+                    val newRating = if (isSameTag) null else tagToRating[event.tag]
+                    currentState.copy(selectedTag = newTag, rating = newRating, error = null)
                 }
             }
             SleepQualityUiEvent.SaveQuality -> saveQuality()
@@ -47,11 +53,9 @@ class SleepQualityViewModel @Inject constructor(
 
     private fun saveQuality() {
         val rating = _state.value.rating ?: return
-
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
             val latestSleep = observeSleepHistoryUseCase().first().firstOrNull()
-
             if (latestSleep != null) {
                 val updatedSleep = latestSleep.copy(calidadSleep = rating)
                 upsertSleepQualityUseCase(updatedSleep)
