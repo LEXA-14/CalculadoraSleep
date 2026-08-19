@@ -103,8 +103,9 @@ class SleepRepositoryImplTest {
     @Test
     fun `delete llama al dao con el id correcto`() = runTest {
         val sleep = Sleep(sleepId = 1, dormirTiempo = 1000L, despertarTiempo = 2000L, ciclos = 4)
+
         repository.delete(sleep)
-        coVerify { dao.deleteById(1) }
+        coVerify { dao.deleteById(1,"user1") }
     }
 }
 
