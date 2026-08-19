@@ -9,6 +9,8 @@ sealed class LoginUiEvent {
     data class GoogleSignInSubmit(val context: Context) : LoginUiEvent()
     object ClearError : LoginUiEvent()
     object ClearSuccess : LoginUiEvent()
+    object Logout: LoginUiEvent()
 
     data class ForgotPassword(val email: String) : LoginUiEvent()
+
 }
