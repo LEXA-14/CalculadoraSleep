@@ -62,6 +62,7 @@ class SleepRepositoryImpl @Inject constructor(
     }
 
     override suspend fun delete(sleep: Sleep) {
-        localDataSource.deleteById(sleep.sleepId)
+        val uid=currentUserId ?: return
+        localDataSource.deleteById(sleep.sleepId,uid )
     }
 }
