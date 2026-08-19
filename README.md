@@ -30,3 +30,22 @@ Modo oscuro: tema claro/oscuro persistente controlado desde la app.
 5-Cuando la alarma suena, aparece una notificación de pantalla completa con opción de Detener; al detenerla se abre la pantalla de Calidad del sueño para calificar tu descanso de 1 a 5.
 
 6-Cada sesión registrada aparece en la pestaña Historial, junto con estadísticas agregadas de los últimos días.
+
+Video:
+https://ucneedu-my.sharepoint.com/:w:/g/personal/leudy_jaquez_ucne_edu_do/IQAeAncVEv9nR6A8qiyVb18YAZztbE21u7Bs_RPmRofwi2M?e=9c7UOt 
+
+Prueba
+
+<img width="520" height="1180" alt="WhatsApp Image 2026-08-19 at 1 50 13 PM" src="https://github.com/user-attachments/assets/3437cb12-56a2-4b9d-8bcc-de35a4f6032e" />
+
+
+<img width="520" height="1180" alt="WhatsApp Image 2026-08-19 at 1 50 13 PM (2)" src="https://github.com/user-attachments/assets/ed35820f-c488-4db6-9253-86bde49beacb" />
+
+
+<img width="520" height="1180" alt="WhatsApp Image 2026-08-19 at 1 50 13 PM (4)" src="https://github.com/user-attachments/assets/2c89dca5-77c0-4589-83ff-ce8b4c1f12cd" />
+
+<img width="398" height="886" alt="WhatsApp Image 2026-08-19 at 5 31 05 PM" src="https://github.com/user-attachments/assets/81b21803-b458-45db-978d-ddcc49c73671" />
+
+
+
+
