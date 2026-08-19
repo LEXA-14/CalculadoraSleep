@@ -31,7 +31,7 @@ Modo oscuro: tema claro/oscuro persistente controlado desde la app.
 
 6-Cada sesión registrada aparece en la pestaña Historial, junto con estadísticas agregadas de los últimos días.
 
-Video:
+Video de Youtube:
 https://ucneedu-my.sharepoint.com/:w:/g/personal/leudy_jaquez_ucne_edu_do/IQAeAncVEv9nR6A8qiyVb18YAZztbE21u7Bs_RPmRofwi2M?e=9c7UOt 
 
 Prueba
