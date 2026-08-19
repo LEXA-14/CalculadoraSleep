@@ -35,8 +35,16 @@ class RegisterUseCaseTest {
 
     @Test
     fun `cuando los datos son validos retorna exito`() = runTest {
-        coEvery { repository.register("test@test.com", "123456", "Test User") } returns Result.success(true)
+        coEvery { repository.register("test@test.com", "123456", "Test User") } returns true
         val result = useCase("test@test.com", "123456", "Test User")
         assertTrue(result.isSuccess)
+    }
+
+    @Test
+    fun `cuando el repositorio falla retorna error capturado`() = runTest {
+        coEvery { repository.register(any(), any(), any()) } throws Exception("Registration error")
+        val result = useCase("test@test.com", "123456", "Test User")
+        assertTrue(result.isFailure)
+        assertEquals("Registration error", result.exceptionOrNull()?.message)
     }
 }

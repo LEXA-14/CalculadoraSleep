@@ -20,8 +20,15 @@ class ResetPasswordUseCaseTest {
 
     @Test
     fun `llama al repositorio para resetear contrasena`() = runTest {
-        coEvery { repository.resetPassword("test@test.com") } returns Result.success(true)
+        coEvery { repository.resetPassword("test@test.com") } returns true
         val result = useCase("test@test.com")
         assertTrue(result.isSuccess)
+    }
+
+    @Test
+    fun `cuando el repositorio falla retorna error capturado`() = runTest {
+        coEvery { repository.resetPassword(any()) } throws Exception("Reset error")
+        val result = useCase("test@test.com")
+        assertTrue(result.isFailure)
     }
 }
