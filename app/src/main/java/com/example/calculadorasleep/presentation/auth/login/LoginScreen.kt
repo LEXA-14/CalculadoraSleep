@@ -5,19 +5,26 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Visibility
+import androidx.compose.material.icons.rounded.VisibilityOff
 import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -71,6 +78,9 @@ fun LoginBody(
     onGoogleSignInClick: () -> Unit,
     onForgotPasswordClick: (String) -> Unit
 ) {
+    val passwordFocusRequester = remember { FocusRequester() }
+    var passwordVisible by remember { mutableStateOf(false) }
+
     Scaffold { padding ->
         Box(
             modifier = Modifier
@@ -144,7 +154,13 @@ fun LoginBody(
                             .fillMaxWidth()
                             .testTag("login_email"),
                         shape = RoundedCornerShape(12.dp),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Email,
+                            imeAction = ImeAction.Next
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = { passwordFocusRequester.requestFocus() }
+                        ),
                         singleLine = true
                     )
 
@@ -156,10 +172,30 @@ fun LoginBody(
                         label = { Text("Contraseña") },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .testTag("login_password"),
+                            .testTag("login_password")
+                            .focusRequester(passwordFocusRequester),
                         shape = RoundedCornerShape(12.dp),
-                        visualTransformation = PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = if (state.password.isNotEmpty()) {
+                            {
+                                val image = if (passwordVisible) Icons.Rounded.Visibility else Icons.Rounded.VisibilityOff
+                                val description = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+
+                                IconButton(
+                                    onClick = { passwordVisible = !passwordVisible },
+                                    modifier = Modifier.testTag("password_visibility_toggle")
+                                ) {
+                                    Icon(imageVector = image, contentDescription = description)
+                                }
+                            }
+                        } else null,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Password,
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = { onEvent(LoginUiEvent.LoginSubmit) }
+                        ),
                         singleLine = true
                     )
 

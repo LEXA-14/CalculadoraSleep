@@ -1,5 +1,6 @@
 package com.example.calculadorasleep.presentation.quality
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.calculadorasleep.MainDispatcherRule
 import com.example.calculadorasleep.domain.sleep.UseCases.ObserveSleepHistoryUseCase
 import com.example.calculadorasleep.domain.sleep.UseCases.quality.UpsertSleepQualityUseCase
@@ -9,8 +10,8 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
@@ -18,8 +19,12 @@ import org.junit.Test
 
 @ExperimentalCoroutinesApi
 class SleepQualityViewModelTest {
+
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
+
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private lateinit var upsertSleepQualityUseCase: UpsertSleepQualityUseCase
     private lateinit var observeSleepHistoryUseCase: ObserveSleepHistoryUseCase
@@ -33,15 +38,25 @@ class SleepQualityViewModelTest {
     }
 
     @Test
-    fun `cuando se cambia el rating se actualiza el estado`() {
-        viewModel.onEvent(SleepQualityUiEvent.RatingChanged(4))
-        assertEquals(4, viewModel.state.value.rating)
+    fun `cambiar rating actualiza el estado y el tag sugerido`() {
+        viewModel.onEvent(SleepQualityUiEvent.RatingChanged(5))
+        
+        assertEquals(5, viewModel.state.value.rating)
+        assertEquals("Me siento descansado", viewModel.state.value.selectedTag)
     }
 
     @Test
-    fun `cuando se toca el mismo rating se deselecciona`() {
-        viewModel.onEvent(SleepQualityUiEvent.RatingChanged(4))
-        viewModel.onEvent(SleepQualityUiEvent.RatingChanged(4))
+    fun `cuando se toca un tag se actualiza el rating correspondiente`() {
+        val tag = "Interrumpido"
+        
+        viewModel.onEvent(SleepQualityUiEvent.TagToggled(tag))
+        
+        assertEquals(tag, viewModel.state.value.selectedTag)
+        assertEquals(1, viewModel.state.value.rating)
+        
+        viewModel.onEvent(SleepQualityUiEvent.TagToggled(tag))
+        
+        assertNull(viewModel.state.value.selectedTag)
         assertNull(viewModel.state.value.rating)
     }
 
@@ -57,15 +72,5 @@ class SleepQualityViewModelTest {
 
         assertTrue(viewModel.state.value.isSaved)
         assertFalse(viewModel.state.value.isLoading)
-    }
-
-    @Test
-    fun `cuando se agrega o quita un tag se actualiza la lista`() {
-        val tag = "Descansado"
-        viewModel.onEvent(SleepQualityUiEvent.TagToggled(tag))
-        assertTrue(viewModel.state.value.selectedTags.contains(tag))
-
-        viewModel.onEvent(SleepQualityUiEvent.TagToggled(tag))
-        assertFalse(viewModel.state.value.selectedTags.contains(tag))
     }
 }
